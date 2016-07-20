@@ -29,8 +29,8 @@ for s = 1:numel(subjects) % loops around the P numbers
     clc; int2str(subjects(s))
     
     load(['raw_data\Sub',int2str(subjects(s))]); % loads basic data
-    load(['Processed Saccades\SummarySaccadeDataP',int2str(subjects(s))]); % loads saccade summary
-    load(['Processed Fixations\Sub', int2str(subjects(s))]); % loads fixations
+    load(['processed_saccades\SummarySaccadeDataP',int2str(subjects(s))]); % loads saccade summary
+    load(['processed_fixations\Sub', int2str(subjects(s))]); % loads fixations
     dR = [DATA.results summarySaccadeData(:,3:9)]; % combine Data; % now includes discard_anticipatory & discard_unfixated
 
     % find last fixation position and last entries and add to data
