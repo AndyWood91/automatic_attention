@@ -106,10 +106,10 @@ for s = 1:numel(subjects)
         end
         
         % TODO: folder check
-        Folder = pwd;
-        [PathStr,FolderName] = fileparts(Folder);
-        processed_fixations = ['DATA-',FolderName];
-        mkdir(processed_fixations);
+%         Folder = pwd;
+%         [PathStr,FolderName] = fileparts(Folder);
+%         processed_fixations = ['DATA-',FolderName];
+%         mkdir(processed_fixations);
 
         fileName = ['processed_fixations\Sub' int2str(subjects(s))];
 
