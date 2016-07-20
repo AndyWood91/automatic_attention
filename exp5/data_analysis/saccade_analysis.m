@@ -44,7 +44,7 @@ for s = 1:numel(subjects) % loops around the P numbers
         % find last entry
         dLE = cell2mat(DATA_CUES_PROC(f,2));
         for e = 1:size(dLE,1)
-           onStim = checkEGOnStim(dLE(e,1),dLE(e,2),[0, 0, 900, 1080; 1020, 0, 1920, 1080]);
+           onStim = check_EG_on_stimulus(dLE(e,1),dLE(e,2),[0, 0, 900, 1080; 1020, 0, 1920, 1080]);
            if onStim > 0
                lastFixEntry(f,5) = onStim-1;
            end

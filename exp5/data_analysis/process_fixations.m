@@ -104,8 +104,14 @@ for s = 1:numel(subjects)
             DATA_EG_PROC(t,:) = {fixStore EGdata [GapsBeforeFill GapsAfterFill]}; % store in cell
 
         end
-    
-        fileName = ['Processed Fixations\Sub' int2str(subjects(s))];
+        
+        % TODO: folder check
+        Folder = pwd;
+        [PathStr,FolderName] = fileparts(Folder);
+        processed_fixations = ['DATA-',FolderName];
+        mkdir(processed_fixations);
+
+        fileName = ['processed_fixations\Sub' int2str(subjects(s))];
 
         DATA_CUES_PROC = DATA_EG_PROC;
         save(fileName,'DATA_CUES_PROC','DATA');
