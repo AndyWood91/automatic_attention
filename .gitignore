@@ -1,2 +1,5 @@
 # Matlab data files - too large to make syncing efficient
 *.mat
+
+# Matlab autosave
+*.asv
