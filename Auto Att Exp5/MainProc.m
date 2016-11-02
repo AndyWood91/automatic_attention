@@ -74,13 +74,13 @@ MidV = WinHeight/2;
 winPos = zeros(1,4);
 winPos([1 3]) = [(ScreenRes(1)-WinWidth)/2  ScreenRes(1)-(ScreenRes(1)-WinWidth)/2];
 winPos([2 4]) = [ScreenRes(2)-WinHeight ScreenRes(2)];
-winPos = [0 0 720 450];
+% winPos = [0 0 720 450];
 
 % create windows and textures
 MainWindow = Screen ('OpenWindow', 0, BGcol, winPos);
 Screen('TextSize', MainWindow, 30);
 Screen('TextFont', MainWindow, 'Arial' );
-Screen('TextColor',MainWindow, [0 0 0]);
+Screen('TextColor', MainWindow, [0 0 0]);
 
 % gabor properties
 GBsize = 400;
@@ -175,6 +175,8 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         corResp = 40;
     end
     RevInst = trialStructure(trial,6);
+    
+    % ANDY - Gaze contingent fixation goes here
     
     % fixation dot
     Screen('FillOval', MainWindow , fixCol, [MidH-fixSize MidV-fixSize MidH+fixSize MidV+fixSize])    

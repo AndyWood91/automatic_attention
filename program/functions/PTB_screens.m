@@ -1,10 +1,11 @@
-function [main_window, off_window] = PTB_screens(background)
+function [main_window, off_window, screen_dimensions] = PTB_screens(background, text)
     
     global TESTING
     
     % screen dimensions
     screen_number = 0;  % primary monitor
     [screen_width, screen_height] = Screen('WindowSize', screen_number);
+    screen_dimensions = [screen_width, screen_height];
     
     % PTB window
     if TESTING == 1
@@ -18,9 +19,12 @@ function [main_window, off_window] = PTB_screens(background)
     
     % PTB windows
     main_window = Screen('OpenWindow', screen_number, background, PTB_screen);
-    % set font, size, colour, etc. here
+
     off_window = Screen('OpenOffscreenWindow', screen_number, background, PTB_screen);
-    % set font, size, colour, etc. here
+    Screen('TextSize', off_window, 50);
+    Screen('TextFont', off_window, 'Arial');
+    Screen('TextColor', off_window, text);  % already an input
+    % set font, size, colour, etc. here - could be inputs later
     
 
 end
