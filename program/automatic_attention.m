@@ -24,3 +24,5 @@ create_gabors;
 show_instructions(main_window, off_window, instructions);
 
 sca;
+
+MainProc;
