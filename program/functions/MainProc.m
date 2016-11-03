@@ -1,4 +1,6 @@
-function [] = MainProc(main_window, off_window, DATA)
+function [] = MainProc(main_window, off_window, screen_dimensions, DATA)
+
+test_rectangle = [0 0 screen_dimensions(1, 1)*0.75 screen_dimensions(1, 2)*0.75];
 
 runET = 0;
 
@@ -102,30 +104,21 @@ ITI = .5;
 % freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
 % GBprop = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
 % GBpos = [50 MidV-GBsize/2 50+GBsize MidV+GBsize/2; WinWidth-50-GBsize MidV-GBsize/2 WinWidth-50 MidV+GBsize/2];
-%%
-
-% Instructions
-
-% coming in here to get instructions to display
-% maketexture should work now
+%% Setup Instruction Screens
 for a = 1:7
     instruction_file = ['Instructions/Slide', int2str(a), '.jpg'];
     instruction_stimulus(a) = Screen('MakeTexture', main_window, imread(instruction_file));
-    Screen('DrawTexture', main_window, instruction_stimulus(a), [], [0 0 600 600]);
-    Screen('Flip', main_window);
-    WaitSecs(2);
+%     Screen('DrawTexture', main_window, instruction_stimulus(a), [], test_rectangle);
+%     Screen('Flip', main_window);
+%     WaitSecs(2);
 end
 
-sca;  % HERE
+errorFB = Screen('MakeTexture', main_window, imread('Instructions/Slide8.jpg'));
+errorTO = Screen('MakeTexture', main_window, imread('Instructions/Slide9.jpg'));
+restScreen = Screen('MakeTexture', main_window, imread('Instructions/Slide10.jpg'));
+debriefScreen = Screen('MakeTexture', main_window, imread('Instructions/Slide11.jpg'));
 
-for i = 1:7 
-    Ftext = strcat('Instructions/Slide',int2str(i),'.jpg');
-    instStim(i) =Screen('MakeTexture', main_window, double(imread(Ftext)));
-end 
-errorFB = Screen('MakeTexture', main_window, double (imread('Instructions/Slide8.jpg')));
-errorTO = Screen('MakeTexture', main_window, double (imread('Instructions/Slide9.jpg')));
-restScreen = Screen('MakeTexture', main_window, double (imread('Instructions/Slide10.jpg')));
-debriefScreen = Screen('MakeTexture', main_window, double (imread('Instructions/Slide11.jpg')));
+%% 
 
 if runET == 1
     tetio_startTracking;
@@ -161,16 +154,16 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     if trial == 1 % put up inst 1
         for i = 1:4
             if i == 4
-                RestrictKeysForKbCheck(112); % F1 key
+                RestrictKeysForKbCheck(KbName('space')); % spacebar
             end
-            Screen('DrawTexture', main_window, instStim(i));
+            Screen('DrawTexture', main_window, instruction_stimulus(i), [], test_rectangle);
             Screen('Flip', main_window);
             [~, ~] = accKbWait;
         end
         trialAngles = GBanglesStg1; % intial gabor angles for Stage 1
     elseif trial == stage2instAT % Stage 2 instructions
         RestrictKeysForKbCheck(112); % F1 key            
-        Screen('DrawTexture', main_window, instStim(5));
+        Screen('DrawTexture', main_window, instruction_stimulus(5), [], test_rectangle);
         Screen('Flip', main_window);
         [~, ~] = accKbWait;
         trialAngles = GBanglesStg2; % new gabor angles for Stage 2
@@ -179,7 +172,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
             if i == 7
                 RestrictKeysForKbCheck(112); % F1 key
             end
-            Screen('DrawTexture', main_window, instStim(i));
+            Screen('DrawTexture', main_window, instruction_stimulus(i), [], test_rectangle);
             Screen('Flip', main_window);
             [~, ~] = accKbWait;
         end

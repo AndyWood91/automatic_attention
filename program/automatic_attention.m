@@ -17,4 +17,4 @@ create_gabors;
 % show_instructions(main_window, off_window, {'string', 'a string'})
 
 
-MainProc(main_window, off_window, DATA);
+MainProc(main_window, off_window, screen_dimensions, DATA);
