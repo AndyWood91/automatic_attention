@@ -10,7 +10,7 @@ function [main_window, off_window, screen_dimensions] = PTB_screens(background, 
     % PTB window
     if TESTING == 1
         Screen('Preference', 'SkipSyncTests', 1);  % skip PTB calibration
-        PTB_screen = [0 0 screen_width/2 screen_height/2];  % quarter screen
+        PTB_screen = [0 0 screen_width*.75 screen_height*.75];  % half screen
     elseif TESTING == 0
         PTB_screen = [0 0 screen_width screen_height];  % full screen
     else

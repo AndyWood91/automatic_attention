@@ -1,4 +1,4 @@
-function MainProc
+function  MainProc
 
 runET = 0;
 
@@ -44,7 +44,7 @@ start_time = datestr(now,0);
 DATA.details = {age sex hand language start_time};
 save(filePath,'DATA', '-v7.3'); % save DATA structure
 
-KbName('UnifyKeyNames');
+% KbName('UnifyKeyNames');  % Andy - in automatic_attention now
 
 % parameters
 BGcol = [255 255 255];

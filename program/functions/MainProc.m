@@ -1,4 +1,4 @@
-function MainProc
+function [] = MainProc(main_window, off_window)
 
 runET = 0;
 
@@ -22,32 +22,34 @@ fixEG = cell(size(trialStructure,1),2); % data to be stored for fixation period.
 instEG = cell(size(trialStructure,1),2); % data to be stored for fixation period.
 stimEG = cell(size(trialStructure,1),2); % data to be stored for stimulus presentation period.
 
-%check if this subject and session has been run
-subNum = input('Enter participant number ---> ');
-app_home = cd;
-cd(app_home); 
-filename = strcat('Sub ', int2str(subNum));
-filePath = strcat(app_home,'/DATA/',filename);
+%% Andy - in get_details now
+% %check if this subject and session has been run
+% subNum = input('Enter participant number ---> ');
+% app_home = cd;
+% cd(app_home); 
+% filename = strcat('Sub ', int2str(subNum));
+% filePath = strcat(app_home,'/DATA/',filename);
+% 
+% if exist(strcat(filePath,'.mat'), 'file') > 0
+%     strcat(filename, ' already exists - check program parameters and try again.')
+%     return
+% end
+% 
+% 
+% % get participant details
+% age = input('Enter your age ---> ');
+% sex = input('Enter your gender (M/F) ---> ', 's' );
+% hand = input('Are you left of right handed? (R/L) ---> ','s');
+% language = input('Is English your first language? (Y/N) ---> ','s');
+% start_time = datestr(now,0);
+% DATA.details = {age sex hand language start_time};
+% save(filePath,'DATA', '-v7.3'); % save DATA structure
+%%
 
-if exist(strcat(filePath,'.mat'), 'file') > 0
-    strcat(filename, ' already exists - check program parameters and try again.')
-    return
-end
-
-
-% get participant details
-age = input('Enter your age ---> ');
-sex = input('Enter your gender (M/F) ---> ', 's' );
-hand = input('Are you left of right handed? (R/L) ---> ','s');
-language = input('Is English your first language? (Y/N) ---> ','s');
-start_time = datestr(now,0);
-DATA.details = {age sex hand language start_time};
-save(filePath,'DATA', '-v7.3'); % save DATA structure
-
-KbName('UnifyKeyNames');
+% KbName('UnifyKeyNames');  % Andy - in automatic_attention now
 
 % parameters
-BGcol = [255 255 255];
+% BGcol = [255 255 255];
 iSize = 50; % Instruction stimulus size
 stage2instAT = 161; % when Stage 2 instructions start
 stage3instAT = 305; % when Stage 3 instructions start
@@ -65,48 +67,52 @@ timeoutLength = 3;
 fbTime = 2;
 ITI = .5; 
 
-% ScreenRes = [2560 1440];
-ScreenRes = [1920 1080];
-WinHeight = 1080;
-WinWidth = 1920;
-MidH = WinWidth/2;
-MidV = WinHeight/2;
-winPos = zeros(1,4);
-winPos([1 3]) = [(ScreenRes(1)-WinWidth)/2  ScreenRes(1)-(ScreenRes(1)-WinWidth)/2];
-winPos([2 4]) = [ScreenRes(2)-WinHeight ScreenRes(2)];
-% winPos = [0 0 720 450];
+%% Andy - in PTB_screens now
+% % ScreenRes = [2560 1440];
+% ScreenRes = [1920 1080];
+% WinHeight = 1080;
+% WinWidth = 1920;
+% MidH = WinWidth/2;
+% MidV = WinHeight/2;
+% winPos = zeros(1,4);
+% winPos([1 3]) = [(ScreenRes(1)-WinWidth)/2  ScreenRes(1)-(ScreenRes(1)-WinWidth)/2];
+% winPos([2 4]) = [ScreenRes(2)-WinHeight ScreenRes(2)];
+% % winPos = [0 0 720 450];
+% 
+% % create windows and textures
+% main_window = Screen ('OpenWindow', 0, BGcol, winPos);
+% Screen('TextSize', main_window, 30);
+% Screen('TextFont', main_window, 'Arial' );
+% Screen('TextColor', main_window, [0 0 0]);
 
-% create windows and textures
-MainWindow = Screen ('OpenWindow', 0, BGcol, winPos);
-Screen('TextSize', MainWindow, 30);
-Screen('TextFont', MainWindow, 'Arial' );
-Screen('TextColor', MainWindow, [0 0 0]);
 
-% gabor properties
-GBsize = 400;
-[myGrating, ~] = CreateProceduralGabor(MainWindow, GBsize, GBsize, 0, [BGcol/255 0], [], 5);
-GBanglesStg1 = [95 265 95 265 90 270 90 270];
-GBanglesStg2 = [95 265 95 265 95 265 95 265];
-red = [0 1000 1000];
-green = [1000 0 1000];
-blue = [1000 1000 0];
-grey = [500 500 500];
-cols = [red; green; blue; grey];
-cols = cols(randperm(4),:); % randomises order of colours
-GBcols = [cols(1,:); cols(1,:); cols(2,:); cols(2,:); cols(3,:); cols(3,:); cols(4,:); cols(4,:)];
-freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
-GBprop = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
-GBpos = [50 MidV-GBsize/2 50+GBsize MidV+GBsize/2; WinWidth-50-GBsize MidV-GBsize/2 WinWidth-50 MidV+GBsize/2];
+%% Andy - in create_gabors now
+% % gabor properties
+% GBsize = 400;
+% [myGrating, ~] = CreateProceduralGabor(main_window, GBsize, GBsize, 0, [BGcol/255 0], [], 5);
+% GBanglesStg1 = [95 265 95 265 90 270 90 270];
+% GBanglesStg2 = [95 265 95 265 95 265 95 265];
+% red = [0 1000 1000];
+% green = [1000 0 1000];
+% blue = [1000 1000 0];
+% grey = [500 500 500];
+% cols = [red; green; blue; grey];
+% cols = cols(randperm(4),:); % randomises order of colours
+% GBcols = [cols(1,:); cols(1,:); cols(2,:); cols(2,:); cols(3,:); cols(3,:); cols(4,:); cols(4,:)];
+% freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
+% GBprop = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
+% GBpos = [50 MidV-GBsize/2 50+GBsize MidV+GBsize/2; WinWidth-50-GBsize MidV-GBsize/2 WinWidth-50 MidV+GBsize/2];
+%%
 
 % Instructions 
 for i = 1:7 
     Ftext = strcat('Instructions/Slide',int2str(i),'.jpg');
-    instStim(i) =Screen('MakeTexture', MainWindow, double(imread(Ftext)));
+    instStim(i) =Screen('MakeTexture', main_window, double(imread(Ftext)));
 end 
-errorFB = Screen('MakeTexture', MainWindow, double (imread('Instructions/Slide8.jpg')));
-errorTO = Screen('MakeTexture', MainWindow, double (imread('Instructions/Slide9.jpg')));
-restScreen = Screen('MakeTexture', MainWindow, double (imread('Instructions/Slide10.jpg')));
-debriefScreen = Screen('MakeTexture', MainWindow, double (imread('Instructions/Slide11.jpg')));
+errorFB = Screen('MakeTexture', main_window, double (imread('Instructions/Slide8.jpg')));
+errorTO = Screen('MakeTexture', main_window, double (imread('Instructions/Slide9.jpg')));
+restScreen = Screen('MakeTexture', main_window, double (imread('Instructions/Slide10.jpg')));
+debriefScreen = Screen('MakeTexture', main_window, double (imread('Instructions/Slide11.jpg')));
 
 if runET == 1
     tetio_startTracking;
@@ -123,16 +129,16 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         d = DATA.results(1:checkAccAt,8);
         mean(d==0)
         mean(d==9999)
-        DrawFormattedText(MainWindow, ['Your error rate so far is ', num2str(round(mean(d==0)*100)), ' %'], 'center', MidV-150);
-        DrawFormattedText(MainWindow, ['Your timeout % so far is ', num2str(round(mean(d==9999)*100)), ' %'], 'center', MidV-50);
-        DrawFormattedText(MainWindow, 'Please contact the experimenter', 'center', MidV+50);
-        Screen('Flip', MainWindow);
+        DrawFormattedText(main_window, ['Your error rate so far is ', num2str(round(mean(d==0)*100)), ' %'], 'center', MidV-150);
+        DrawFormattedText(main_window, ['Your timeout % so far is ', num2str(round(mean(d==9999)*100)), ' %'], 'center', MidV-50);
+        DrawFormattedText(main_window, 'Please contact the experimenter', 'center', MidV+50);
+        Screen('Flip', main_window);
         [~, ~] = accKbWait;
     end
     if restCount == restEvery
         restCount = 0;
-        Screen('DrawTexture', MainWindow, restScreen);
-        Screen('Flip', MainWindow);
+        Screen('DrawTexture', main_window, restScreen);
+        Screen('Flip', main_window);
         WaitSecs(30);
     end
     restCount = restCount + 1;
@@ -144,15 +150,15 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
             if i == 4
                 RestrictKeysForKbCheck(112); % F1 key
             end
-            Screen('DrawTexture', MainWindow, instStim(i));
-            Screen('Flip', MainWindow);
+            Screen('DrawTexture', main_window, instStim(i));
+            Screen('Flip', main_window);
             [~, ~] = accKbWait;
         end
         trialAngles = GBanglesStg1; % intial gabor angles for Stage 1
     elseif trial == stage2instAT % Stage 2 instructions
         RestrictKeysForKbCheck(112); % F1 key            
-        Screen('DrawTexture', MainWindow, instStim(5));
-        Screen('Flip', MainWindow);
+        Screen('DrawTexture', main_window, instStim(5));
+        Screen('Flip', main_window);
         [~, ~] = accKbWait;
         trialAngles = GBanglesStg2; % new gabor angles for Stage 2
     elseif trial == stage3instAT % Stage 3 instructions
@@ -160,8 +166,8 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
             if i == 7
                 RestrictKeysForKbCheck(112); % F1 key
             end
-            Screen('DrawTexture', MainWindow, instStim(i));
-            Screen('Flip', MainWindow);
+            Screen('DrawTexture', main_window, instStim(i));
+            Screen('Flip', main_window);
             [~, ~] = accKbWait;
         end
     end
@@ -179,36 +185,36 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     % ANDY - Gaze contingent fixation goes here
     
     % fixation dot
-    Screen('FillOval', MainWindow , fixCol, [MidH-fixSize MidV-fixSize MidH+fixSize MidV+fixSize])    
-    tempTS(1) = Screen('Flip', MainWindow);
+    Screen('FillOval', main_window , fixCol, [MidH-fixSize MidV-fixSize MidH+fixSize MidV+fixSize])    
+    tempTS(1) = Screen('Flip', main_window);
     WaitSecs(fixTime);
     % screenshot
-    imageArray=Screen('GetImage', MainWindow);
+    imageArray=Screen('GetImage', main_window);
     imwrite(imageArray,'ss1','jpg')
     
     if fix_to_ITI_time > 0
-        Screen('Flip', MainWindow); % blank 
+        Screen('Flip', main_window); % blank 
         WaitSecs(fix_to_ITI_time + rand * .5);
     end
     
     % Draw normal/reversal instruction
     if RevInst == 0
-        Screen('FillOval', MainWindow , iCol, [MidH-iSize MidV-iSize MidH+iSize MidV+iSize]);
+        Screen('FillOval', main_window , iCol, [MidH-iSize MidV-iSize MidH+iSize MidV+iSize]);
     elseif RevInst == 1
-        Screen('FillRect', MainWindow , iCol, [MidH-iSize MidV-iSize MidH+iSize MidV+iSize]);
+        Screen('FillRect', main_window , iCol, [MidH-iSize MidV-iSize MidH+iSize MidV+iSize]);
     end
-    Screen('FillOval', MainWindow , fixCol, [MidH-fixSize MidV-fixSize MidH+fixSize MidV+fixSize]); 
-    tempTS(2) = Screen('Flip', MainWindow);
+    Screen('FillOval', main_window , fixCol, [MidH-fixSize MidV-fixSize MidH+fixSize MidV+fixSize]); 
+    tempTS(2) = Screen('Flip', main_window);
     WaitSecs(instTime);
         
     % Draw gabors on screen
     for c = 1:2
-        Screen('DrawTexture', MainWindow, myGrating, [], GBpos(c,:), trialAngles(circleOrder(c)), [], [], GBcols(circleOrder(c),:), [], kPsychDontDoRotation, GBprop);
+        Screen('DrawTexture', main_window, myGrating, [], GBpos(c,:), trialAngles(circleOrder(c)), [], [], GBcols(circleOrder(c),:), [], kPsychDontDoRotation, GBprop);
     end 
-    tempTS(3) = Screen('Flip', MainWindow);
+    tempTS(3) = Screen('Flip', main_window);
     
 %     % screenshot
-%     imageArray=Screen('GetImage', MainWindow);
+%     imageArray=Screen('GetImage', main_window);
 %     imwrite(imageArray,'ss1','jpg')
     
     % wait for and record response
@@ -239,15 +245,15 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         break
     end
     
-    tempTS(4) = Screen('Flip', MainWindow); % flip blank screen on after response  
+    tempTS(4) = Screen('Flip', main_window); % flip blank screen on after response  
     % error feedback
     if accuracy == 0
-        Screen('DrawTexture', MainWindow, errorFB);
-        Screen('Flip', MainWindow);
+        Screen('DrawTexture', main_window, errorFB);
+        Screen('Flip', main_window);
         WaitSecs(fbTime);  
     elseif timeout == 1
-        Screen('DrawTexture', MainWindow, errorTO);
-        Screen('Flip', MainWindow);
+        Screen('DrawTexture', main_window, errorTO);
+        Screen('Flip', main_window);
         WaitSecs(fbTime);
     end
     WaitSecs(ITI);
@@ -274,8 +280,8 @@ if runET == 1
 end
 DATA.totalTimeMins = (GetSecs-timeStart)/60;
 RestrictKeysForKbCheck(121); % F10 key
-Screen('DrawTexture', MainWindow, debriefScreen);
-Screen ('Flip', MainWindow);
+Screen('DrawTexture', main_window, debriefScreen);
+Screen ('Flip', main_window);
 save(filePath,'DATA'); % save results to disk
 [~, ~] = accKbWait;
 
