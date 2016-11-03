@@ -1,4 +1,4 @@
-function [] = MainProc(main_window, off_window)
+function [] = MainProc(main_window, off_window, DATA)
 
 runET = 0;
 
@@ -12,9 +12,9 @@ RandStream.setGlobalStream(RandStream('mt19937ar','seed',sum(100*clock)));
 
 trialStructure = makeTrialStructure; % get the trial structure
 
-timeStart = GetSecs;
+% timeStart = GetSecs;  % Andy - in get_details
 
-DATA = struct;
+% DATA = struct;  % Andy - passing in DATA from get_details
 DATA.results = zeros(size(trialStructure,1),9); % # of rows, 7 columns (SEE END)
 DATA.results(:,1:6) = trialStructure; % can write this part in now
 
@@ -104,7 +104,20 @@ ITI = .5;
 % GBpos = [50 MidV-GBsize/2 50+GBsize MidV+GBsize/2; WinWidth-50-GBsize MidV-GBsize/2 WinWidth-50 MidV+GBsize/2];
 %%
 
-% Instructions 
+% Instructions
+
+% coming in here to get instructions to display
+% maketexture should work now
+for a = 1:7
+    instruction_file = ['Instructions/Slide', int2str(a), '.jpg'];
+    instruction_stimulus(a) = Screen('MakeTexture', main_window, imread(instruction_file));
+    Screen('DrawTexture', main_window, instruction_stimulus(a), [], [0 0 600 600]);
+    Screen('Flip', main_window);
+    WaitSecs(2);
+end
+
+sca;  % HERE
+
 for i = 1:7 
     Ftext = strcat('Instructions/Slide',int2str(i),'.jpg');
     instStim(i) =Screen('MakeTexture', main_window, double(imread(Ftext)));
