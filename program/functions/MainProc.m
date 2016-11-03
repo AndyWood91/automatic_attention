@@ -15,7 +15,7 @@ RandStream.setGlobalStream(RandStream('mt19937ar','seed',sum(100*clock)));
 trialStructure = makeTrialStructure; % get the trial structure
 
 % timeStart = GetSecs;  % Andy - in get_details
-
+% 
 % DATA = struct;  % Andy - passing in DATA from get_details
 DATA.results = zeros(size(trialStructure,1),9); % # of rows, 7 columns (SEE END)
 DATA.results(:,1:6) = trialStructure; % can write this part in now
@@ -48,10 +48,10 @@ stimEG = cell(size(trialStructure,1),2); % data to be stored for stimulus presen
 % save(filePath,'DATA', '-v7.3'); % save DATA structure
 %%
 
-% KbName('UnifyKeyNames');  % Andy - in automatic_attention now
+KbName('UnifyKeyNames');
 
 % parameters
-% BGcol = [255 255 255];
+BGcol = [255 255 255];
 iSize = 50; % Instruction stimulus size
 stage2instAT = 161; % when Stage 2 instructions start
 stage3instAT = 305; % when Stage 3 instructions start
@@ -71,15 +71,15 @@ ITI = .5;
 
 %% Andy - in PTB_screens now
 % % ScreenRes = [2560 1440];
-% ScreenRes = [1920 1080];
-% WinHeight = 1080;
-% WinWidth = 1920;
-% MidH = WinWidth/2;
-% MidV = WinHeight/2;
-% winPos = zeros(1,4);
-% winPos([1 3]) = [(ScreenRes(1)-WinWidth)/2  ScreenRes(1)-(ScreenRes(1)-WinWidth)/2];
-% winPos([2 4]) = [ScreenRes(2)-WinHeight ScreenRes(2)];
-% % winPos = [0 0 720 450];
+ScreenRes = [1080 675];
+WinHeight = 675;
+WinWidth = 1080;
+MidH = WinWidth/2;
+MidV = WinHeight/2;
+winPos = zeros(1,4);
+winPos([1 3]) = [(ScreenRes(1)-WinWidth)/2  ScreenRes(1)-(ScreenRes(1)-WinWidth)/2];
+winPos([2 4]) = [ScreenRes(2)-WinHeight ScreenRes(2)];
+
 % 
 % % create windows and textures
 % main_window = Screen ('OpenWindow', 0, BGcol, winPos);
@@ -89,21 +89,21 @@ ITI = .5;
 
 
 %% Andy - in create_gabors now
-% % gabor properties
-% GBsize = 400;
-% [myGrating, ~] = CreateProceduralGabor(main_window, GBsize, GBsize, 0, [BGcol/255 0], [], 5);
-% GBanglesStg1 = [95 265 95 265 90 270 90 270];
-% GBanglesStg2 = [95 265 95 265 95 265 95 265];
-% red = [0 1000 1000];
-% green = [1000 0 1000];
-% blue = [1000 1000 0];
-% grey = [500 500 500];
-% cols = [red; green; blue; grey];
-% cols = cols(randperm(4),:); % randomises order of colours
-% GBcols = [cols(1,:); cols(1,:); cols(2,:); cols(2,:); cols(3,:); cols(3,:); cols(4,:); cols(4,:)];
-% freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
-% GBprop = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
-% GBpos = [50 MidV-GBsize/2 50+GBsize MidV+GBsize/2; WinWidth-50-GBsize MidV-GBsize/2 WinWidth-50 MidV+GBsize/2];
+% gabor properties
+GBsize = 400;
+[myGrating, ~] = CreateProceduralGabor(main_window, GBsize, GBsize, 0, [BGcol/255 0], [], 5);
+GBanglesStg1 = [95 265 95 265 90 270 90 270];
+GBanglesStg2 = [95 265 95 265 95 265 95 265];
+red = [0 1000 1000];
+green = [1000 0 1000];
+blue = [1000 1000 0];
+grey = [500 500 500];
+cols = [red; green; blue; grey];
+cols = cols(randperm(4),:); % randomises order of colours
+GBcols = [cols(1,:); cols(1,:); cols(2,:); cols(2,:); cols(3,:); cols(3,:); cols(4,:); cols(4,:)];
+freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
+GBprop = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
+GBpos = [50 MidV-GBsize/2 50+GBsize MidV+GBsize/2; WinWidth-50-GBsize MidV-GBsize/2 WinWidth-50 MidV+GBsize/2];
 %% Setup Instruction Screens
 for a = 1:7
     instruction_file = ['Instructions/Slide', int2str(a), '.jpg'];
@@ -149,8 +149,9 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     end
     restCount = restCount + 1;
     
-    % SETTING INSTRUCTIONS
-    RestrictKeysForKbCheck(32); % space bar
+%     % SETTING INSTRUCTIONS
+%     % THIS ISN"T WORKING
+    RestrictKeysForKbCheck(32); % space bar 
     if trial == 1 % put up inst 1
         for i = 1:4
             if i == 4
