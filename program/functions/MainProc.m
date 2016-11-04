@@ -151,8 +151,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     restCount = restCount + 1;
     
 %     % SETTING INSTRUCTIONS
-%     % THIS ISN"T WORKING
-    RestrictKeysForKbCheck(KbName('space')); % space bar 
+    RestrictKeysForKbCheck(KbName('space')); % space bar, this isn't working
     if trial == 1 % put up inst 1
         for i = 1:4
             if i == 4
@@ -160,14 +159,14 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
             end
             Screen('DrawTexture', main_window, instruction_stimulus(i), [], test_rectangle);
             Screen('Flip', main_window);
-            [~, ~] = accKbWait;
+            [bin, ~, ~] = accKbWait;
         end
         trialAngles = GBanglesStg1; % intial gabor angles for Stage 1
     elseif trial == stage2instAT % Stage 2 instructions
         RestrictKeysForKbCheck(KbName('p'));            
         Screen('DrawTexture', main_window, instruction_stimulus(5), [], test_rectangle);
         Screen('Flip', main_window);
-        [~, ~] = accKbWait;
+        [bin, ~, ~] = accKbWait;
         trialAngles = GBanglesStg2; % new gabor angles for Stage 2
     elseif trial == stage3instAT % Stage 3 instructions
         for i = 6:7
@@ -176,7 +175,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
             end
             Screen('DrawTexture', main_window, instruction_stimulus(i), [], test_rectangle);
             Screen('Flip', main_window);
-            [~, ~] = accKbWait;
+            [bin, ~, ~] = accKbWait;
         end
     end
     RestrictKeysForKbCheck([KbName('LeftArrow') KbName('RightArrow') KbName('q')]);

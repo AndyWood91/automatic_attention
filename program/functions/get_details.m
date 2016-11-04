@@ -294,5 +294,5 @@ function [DATA] = get_details(title, conditions, sessions, bonus)
         end  % data check loop
     
     end  % exit data check loop
-    
+        
 end  % get_details
