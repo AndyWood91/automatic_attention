@@ -151,11 +151,11 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     
 %     % SETTING INSTRUCTIONS
 %     % THIS ISN"T WORKING
-    RestrictKeysForKbCheck(32); % space bar 
+    RestrictKeysForKbCheck(KbName('space')); % space bar 
     if trial == 1 % put up inst 1
         for i = 1:4
             if i == 4
-                RestrictKeysForKbCheck(KbName('space')); % spacebar
+                RestrictKeysForKbCheck(KbName('F1')); % F1
             end
             Screen('DrawTexture', main_window, instruction_stimulus(i), [], test_rectangle);
             Screen('Flip', main_window);
