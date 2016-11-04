@@ -24,6 +24,7 @@ fixEG = cell(size(trialStructure,1),2); % data to be stored for fixation period.
 instEG = cell(size(trialStructure,1),2); % data to be stored for fixation period.
 stimEG = cell(size(trialStructure,1),2); % data to be stored for stimulus presentation period.
 
+filename = DATA.experiment.filename;
 %% Andy - in get_details now
 % %check if this subject and session has been run
 % subNum = input('Enter participant number ---> ');
@@ -70,7 +71,7 @@ fbTime = 2;
 ITI = .5; 
 
 %% Andy - in PTB_screens now
-% % ScreenRes = [2560 1440];
+% % ScreenRes = [2560 1480];
 ScreenRes = [1080 675];
 WinHeight = 675;
 WinWidth = 1080;
@@ -90,7 +91,7 @@ winPos([2 4]) = [ScreenRes(2)-WinHeight ScreenRes(2)];
 
 %% Andy - in create_gabors now
 % gabor properties
-GBsize = 400;
+GBsize = 800;
 [myGrating, ~] = CreateProceduralGabor(main_window, GBsize, GBsize, 0, [BGcol/255 0], [], 5);
 GBanglesStg1 = [95 265 95 265 90 270 90 270];
 GBanglesStg2 = [95 265 95 265 95 265 95 265];
@@ -131,7 +132,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     
     tempTS = zeros(1,4);
     if trial == checkAccAt
-        RestrictKeysForKbCheck(112); % F1 key
+        RestrictKeysForKbCheck(KbName('p')); % F1 key
         d = DATA.results(1:checkAccAt,8);
         mean(d==0)
         mean(d==9999)
@@ -155,7 +156,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     if trial == 1 % put up inst 1
         for i = 1:4
             if i == 4
-                RestrictKeysForKbCheck(KbName('F1')); % F1
+                RestrictKeysForKbCheck(KbName('p'));
             end
             Screen('DrawTexture', main_window, instruction_stimulus(i), [], test_rectangle);
             Screen('Flip', main_window);
@@ -163,7 +164,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         end
         trialAngles = GBanglesStg1; % intial gabor angles for Stage 1
     elseif trial == stage2instAT % Stage 2 instructions
-        RestrictKeysForKbCheck(112); % F1 key            
+        RestrictKeysForKbCheck(KbName('p'));
         Screen('DrawTexture', main_window, instruction_stimulus(5), [], test_rectangle);
         Screen('Flip', main_window);
         [~, ~] = accKbWait;
@@ -171,21 +172,21 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     elseif trial == stage3instAT % Stage 3 instructions
         for i = 6:7
             if i == 7
-                RestrictKeysForKbCheck(112); % F1 key
+                RestrictKeysForKbCheck(KbName('p'));
             end
             Screen('DrawTexture', main_window, instruction_stimulus(i), [], test_rectangle);
             Screen('Flip', main_window);
             [~, ~] = accKbWait;
         end
     end
-    RestrictKeysForKbCheck([]); % opens all keys up for checking
+    RestrictKeysForKbCheck([KbName('LeftArrow') KbName('RightArrow') KbName('p') KbName('q')]); 
     
     % read in the trial events
     circleOrder = [trialStructure(trial,2) trialStructure(trial,3)];
     if trialStructure(trial,4) == 1;
-        corResp = 38;
+        corResp = 79;  % rightarrow
     else
-        corResp = 40;
+        corResp = 80;  % leftarrow
     end
     RevInst = trialStructure(trial,6);
     
@@ -225,12 +226,13 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
 %     imwrite(imageArray,'ss1','jpg')
     
     % wait for and record response
-    RestrictKeysForKbCheck([38 40 121]); % wait for response (UP or DOWN or F10)
+    RestrictKeysForKbCheck([KbName('LeftArrow') KbName('RightArrow') KbName('p') KbName('q')]);
     [keyCode, keyDown, timeout] = accKbWait(tempTS(3), timeoutLength); % Accurate measure response time, stored as keyDown. If timeout is used specify start time (1) and duration (2).
     RT = 1000 * (keyDown - tempTS(3)); % Response time in ms
     choice = find(keyCode==1);
     
     % determine feedback / accuracy
+    % ANDY - this needs cleaning up
     accuracy = 0;
     if numel(choice) == 1 
         if corResp == choice %DOWN 
@@ -247,7 +249,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     end
     
     % F10 to quit program - you might take this out of final version
-    if choice == 121
+    if choice == 20
         disp('someone pressed the F10 key')
         break
     end
@@ -278,7 +280,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         stimEG(trial,:) = parseEyeData(TS, leftEye, rightEye, tempTS(3), tempTS(4));
     end
     
-    save(filePath,'DATA'); % save results to disk
+    save(DATA.experiment.filename,'DATA'); % save results to disk
     
 end
 if runET == 1

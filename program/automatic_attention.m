@@ -16,6 +16,6 @@ for a = 1:11
     instruction_slides{a} = ['Instructions/Slide', int2str(a), '.jpg'];
 end
 
-show_instructions(main_window, off_window, instruction_slides);
+% show_instructions(main_window, off_window, instruction_slides);
 
 MainProc(main_window, off_window, screen_dimensions, DATA);
