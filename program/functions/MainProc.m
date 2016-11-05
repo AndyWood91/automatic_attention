@@ -73,9 +73,9 @@ create_gabors;
 % black = RGB('black');
 % colours = [red; green; blue; black];
 % colours = colours(randperm(4),:); % randomises order of colours
-GBcolours = [colours(1,:); colours(1,:); colours(2,:); colours(2,:); colours(3,:); colours(3,:); colours(4,:); colours(4,:)];
+% gabor_colours = [colours(1,:); colours(1,:); colours(2,:); colours(2,:); colours(3,:); colours(3,:); colours(4,:); colours(4,:)];
 freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
-GBprop = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
+gabor_proportions = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
 GBpos = [50 MidV-gabor_size/2 50+gabor_size MidV+gabor_size/2; WinWidth-50-gabor_size MidV-gabor_size/2 WinWidth-50 MidV+gabor_size/2];
 %% Setup Instruction Screens
 % for a = 1:11
@@ -183,7 +183,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         
     % Draw gabors on screen
     for c = 1:2
-        Screen('DrawTexture', main_window, myGrating, [], GBpos(c,:), trialAngles(circleOrder(c)), [], [], GBcolours(circleOrder(c),:), [], kPsychDontDoRotation, GBprop);
+        Screen('DrawTexture', main_window, myGrating, [], GBpos(c,:), trialAngles(circleOrder(c)), [], [], gabor_colours(circleOrder(c),:), [], kPsychDontDoRotation, gabor_proportions);
     end 
     tempTS(3) = Screen('Flip', main_window);
     
