@@ -25,29 +25,7 @@ instEG = cell(size(trialStructure,1),2); % data to be stored for fixation period
 stimEG = cell(size(trialStructure,1),2); % data to be stored for stimulus presentation period.
 
 filename = DATA.experiment.filename;
-%% Andy - in get_details now
-% %check if this subject and session has been run
-% subNum = input('Enter participant number ---> ');
-% app_home = cd;
-% cd(app_home); 
-% filename = strcat('Sub ', int2str(subNum));
-% filePath = strcat(app_home,'/DATA/',filename);
-% 
-% if exist(strcat(filePath,'.mat'), 'file') > 0
-%     strcat(filename, ' already exists - check program parameters and try again.')
-%     return
-% end
-% 
-% 
-% % get participant details
-% age = input('Enter your age ---> ');
-% sex = input('Enter your gender (M/F) ---> ', 's' );
-% hand = input('Are you left of right handed? (R/L) ---> ','s');
-% language = input('Is English your first language? (Y/N) ---> ','s');
-% start_time = datestr(now,0);
-% DATA.details = {age sex hand language start_time};
-% save(filePath,'DATA', '-v7.3'); % save DATA structure
-%%
+
 
 KbName('UnifyKeyNames');
 
@@ -71,7 +49,6 @@ fbTime = 2;
 ITI = .5; 
 
 %% Andy - in PTB_screens now
-% % ScreenRes = [2560 1440];
 ScreenRes = [1080 675];
 WinHeight = 675;
 WinWidth = 1080;
@@ -86,20 +63,20 @@ winPos([2 4]) = [ScreenRes(2)-WinHeight ScreenRes(2)];
 % gabor properties
 create_gabors;
 
-GBsize = 400;
-[myGrating, ~] = CreateProceduralGabor(main_window, GBsize, GBsize, 0, [BGcol/255 0], [], 5);
-gabor_angles1 = [95 265 95 265 90 270 90 270];
-gabor_angles2 = [95 265 95 265 95 265 95 265];
-red = RGB('red');
-green = RGB('green');
-blue = RGB('blue');
-black = RGB('black');
-cols = [red; green; blue; black];
-cols = cols(randperm(4),:); % randomises order of colours
-GBcols = [cols(1,:); cols(1,:); cols(2,:); cols(2,:); cols(3,:); cols(3,:); cols(4,:); cols(4,:)];
+% gabor_size = 400;
+[myGrating, ~] = CreateProceduralGabor(main_window, gabor_size, gabor_size, 0, [BGcol/255 0], [], 5);
+% gabor_angles1 = [95 265 95 265 90 270 90 270];
+% gabor_angles2 = [95 265 95 265 95 265 95 265];
+% red = RGB('red');
+% green = RGB('green');
+% blue = RGB('blue');
+% black = RGB('black');
+% colours = [red; green; blue; black];
+% colours = colours(randperm(4),:); % randomises order of colours
+GBcolours = [colours(1,:); colours(1,:); colours(2,:); colours(2,:); colours(3,:); colours(3,:); colours(4,:); colours(4,:)];
 freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
 GBprop = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
-GBpos = [50 MidV-GBsize/2 50+GBsize MidV+GBsize/2; WinWidth-50-GBsize MidV-GBsize/2 WinWidth-50 MidV+GBsize/2];
+GBpos = [50 MidV-gabor_size/2 50+gabor_size MidV+gabor_size/2; WinWidth-50-gabor_size MidV-gabor_size/2 WinWidth-50 MidV+gabor_size/2];
 %% Setup Instruction Screens
 % for a = 1:11
 %     instruction_file = ['Instructions/Slide', int2str(a), '.jpg'];
@@ -206,7 +183,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         
     % Draw gabors on screen
     for c = 1:2
-        Screen('DrawTexture', main_window, myGrating, [], GBpos(c,:), trialAngles(circleOrder(c)), [], [], GBcols(circleOrder(c),:), [], kPsychDontDoRotation, GBprop);
+        Screen('DrawTexture', main_window, myGrating, [], GBpos(c,:), trialAngles(circleOrder(c)), [], [], GBcolours(circleOrder(c),:), [], kPsychDontDoRotation, GBprop);
     end 
     tempTS(3) = Screen('Flip', main_window);
     
