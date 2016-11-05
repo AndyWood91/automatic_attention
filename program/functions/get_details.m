@@ -35,7 +35,7 @@ function [DATA] = get_details(title, conditions, sessions, bonus)
     end
     
     if nargin <1
-        title = '';  % default, no title
+        title = 'experiment_';  % default, no title
     else
         % user input
     end
@@ -111,18 +111,18 @@ function [DATA] = get_details(title, conditions, sessions, bonus)
         end  % if sessions
         
         % filenames
-        participant_filename = ['participant_details/participant', number, '.mat'];
-        experiment_filename = ['raw_data/participant', number, 'session'];  % doesn't include session number yet to make it easier to check for previous session's data
+        participant_filename = ['participant_data/participant', number, '.mat'];
+        experiment_filename = [title, '_data/', title, '_participant', number, 'session'];  % doesn't include session number yet to make it easier to check for previous session's data
         
         % directories
-        if exist('participant_details', 'dir') ~=7  % if participant_details directory doesn't exist
-            mkdir('participant_details');  % make it
+        if exist('participant_data', 'dir') ~=7  % if participant_details directory doesn't exist
+            mkdir('participant_data');  % make it
         else
             % directory already exists
         end
         
-        if exist('raw_data', 'dir') ~=7  % if raw_data directory doesn't exist
-            mkdir('raw_data');  % make it
+        if exist([title, '_data'], 'dir') ~=7  % if raw_data directory doesn't exist
+            mkdir([title, '_data']);  % make it
         else
             % directory already exists
         end
@@ -130,7 +130,7 @@ function [DATA] = get_details(title, conditions, sessions, bonus)
         % session data
         if exist([experiment_filename, session, '.mat'], 'file') == 2  % check for existing data file
             clc;
-            data_exists = 'Session %c data already exists for participant %c.\n\n';
+            data_exists = 'Session %s data already exists for participant %s.\n\n';
             fprintf(data_exists, session, number);
             % data check loop will repeat
         else  % no existing data file

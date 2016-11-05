@@ -7,18 +7,18 @@ addpath('functions');
 global TESTING
 TESTING = 1;
 
+% generic functions
 DATA = get_details('automatic_attention', {}, 1, false);
-
-[RGB] = RGB_colours();
+RGB = RGB_colours();
 [main_window, ~, screen_dimensions] = PTB_screens(RGB('white'), RGB('black'));  % setup PTB screens
+instructions_slides = create_instructions('.jpg', main_window);
 
-create_gabors;
+Screen('FillRect', main_window, RGB('black'));
+Screen('Flip', main_window)
+WaitSecs(2);
+Screen('FillRect', main_window, RGB('white'));
+Screen('Flip', main_window);
+WaitSecs(2);
 
-
-for a = 1:11
-    instruction_slides{a} = ['Instructions/Slide', int2str(a), '.jpg'];
-end
-
-% show_instructions(main_window, off_window, instruction_slides);
-
-MainProc(main_window, screen_dimensions, DATA);
+% automatic_attention functions
+MainProc(main_window, screen_dimensions, instructions_slides, DATA, RGB);
