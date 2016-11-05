@@ -1,4 +1,4 @@
-function [] = MainProc(main_window, off_window, screen_dimensions, DATA)
+function [] = MainProc(main_window, screen_dimensions, DATA)
 
 test_rectangle = [0 0 screen_dimensions(1, 1)*0.75 screen_dimensions(1, 2)*0.75];
 
@@ -106,18 +106,10 @@ freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
 GBprop = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
 GBpos = [50 MidV-GBsize/2 50+GBsize MidV+GBsize/2; WinWidth-50-GBsize MidV-GBsize/2 WinWidth-50 MidV+GBsize/2];
 %% Setup Instruction Screens
-for a = 1:7
+for a = 1:11
     instruction_file = ['Instructions/Slide', int2str(a), '.jpg'];
     instruction_stimulus(a) = Screen('MakeTexture', main_window, imread(instruction_file));
-%     Screen('DrawTexture', main_window, instruction_stimulus(a), [], test_rectangle);
-%     Screen('Flip', main_window);
-%     WaitSecs(2);
 end
-
-errorFB = Screen('MakeTexture', main_window, imread('Instructions/Slide8.jpg'));
-errorTO = Screen('MakeTexture', main_window, imread('Instructions/Slide9.jpg'));
-restScreen = Screen('MakeTexture', main_window, imread('Instructions/Slide10.jpg'));
-debriefScreen = Screen('MakeTexture', main_window, imread('Instructions/Slide11.jpg'));
 
 %% 
 
@@ -144,7 +136,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     end
     if restCount == restEvery
         restCount = 0;
-        Screen('DrawTexture', main_window, restScreen);
+        Screen('DrawTexture', main_window, instruction_stimulus(10));
         Screen('Flip', main_window);
         WaitSecs(30);
     end
@@ -257,11 +249,11 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     tempTS(4) = Screen('Flip', main_window); % flip blank screen on after response  
     % error feedback
     if accuracy == 0
-        Screen('DrawTexture', main_window, errorFB);
+        Screen('DrawTexture', main_window, instruction_stimulus(8));
         Screen('Flip', main_window);
         WaitSecs(fbTime);  
     elseif timeout == 1
-        Screen('DrawTexture', main_window, errorTO);
+        Screen('DrawTexture', main_window, instruction_stimulus(9));
         Screen('Flip', main_window);
         WaitSecs(fbTime);
     end
@@ -289,7 +281,7 @@ if runET == 1
 end
 DATA.totalTimeMins = (GetSecs-timeStart)/60;
 RestrictKeysForKbCheck(121); % F10 key
-Screen('DrawTexture', main_window, debriefScreen);
+Screen('DrawTexture', main_window, instruction_stimulus(11));
 Screen ('Flip', main_window);
 save(filePath,'DATA'); % save results to disk
 [~, ~] = accKbWait;
