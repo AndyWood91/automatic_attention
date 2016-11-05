@@ -13,12 +13,5 @@ RGB = RGB_colours();
 [main_window, ~, screen_dimensions] = PTB_screens(RGB('white'), RGB('black'));  % setup PTB screens
 instructions_slides = create_instructions('.jpg', main_window);
 
-Screen('FillRect', main_window, RGB('black'));
-Screen('Flip', main_window)
-WaitSecs(2);
-Screen('FillRect', main_window, RGB('white'));
-Screen('Flip', main_window);
-WaitSecs(2);
-
 % automatic_attention functions
 MainProc(main_window, screen_dimensions, instructions_slides, DATA, RGB);

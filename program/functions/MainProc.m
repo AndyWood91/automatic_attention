@@ -52,6 +52,7 @@ filename = DATA.experiment.filename;
 KbName('UnifyKeyNames');
 
 % parameters
+BGcol = RGB('white');
 iSize = 50; % Instruction stimulus size
 stage2instAT = 161; % when Stage 2 instructions start
 stage3instAT = 305; % when Stage 3 instructions start
@@ -85,20 +86,20 @@ winPos([2 4]) = [ScreenRes(2)-WinHeight ScreenRes(2)];
 % gabor properties
 create_gabors;
 
-% GBsize = 400;
-% [myGrating, ~] = CreateProceduralGabor(main_window, GBsize, GBsize, 0, [BGcol/255 0], [], 5);
-% gabor_angles1 = [95 265 95 265 90 270 90 270];
-% gabor_angles2 = [95 265 95 265 95 265 95 265];
-% red = RGB('red');
-% green = RGB('green');
-% blue = RGB('blue');
-% black = RGB('black');
-% cols = [red; green; blue; black];
-% cols = cols(randperm(4),:); % randomises order of colours
-% GBcols = [cols(1,:); cols(1,:); cols(2,:); cols(2,:); cols(3,:); cols(3,:); cols(4,:); cols(4,:)];
-% freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
-% GBprop = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
-% GBpos = [50 MidV-GBsize/2 50+GBsize MidV+GBsize/2; WinWidth-50-GBsize MidV-GBsize/2 WinWidth-50 MidV+GBsize/2];
+GBsize = 400;
+[myGrating, ~] = CreateProceduralGabor(main_window, GBsize, GBsize, 0, [BGcol/255 0], [], 5);
+gabor_angles1 = [95 265 95 265 90 270 90 270];
+gabor_angles2 = [95 265 95 265 95 265 95 265];
+red = RGB('red');
+green = RGB('green');
+blue = RGB('blue');
+black = RGB('black');
+cols = [red; green; blue; black];
+cols = cols(randperm(4),:); % randomises order of colours
+GBcols = [cols(1,:); cols(1,:); cols(2,:); cols(2,:); cols(3,:); cols(3,:); cols(4,:); cols(4,:)];
+freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
+GBprop = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
+GBpos = [50 MidV-GBsize/2 50+GBsize MidV+GBsize/2; WinWidth-50-GBsize MidV-GBsize/2 WinWidth-50 MidV+GBsize/2];
 %% Setup Instruction Screens
 % for a = 1:11
 %     instruction_file = ['Instructions/Slide', int2str(a), '.jpg'];
