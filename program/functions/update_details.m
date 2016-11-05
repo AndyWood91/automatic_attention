@@ -1,61 +1,40 @@
-%% update_details
-
-% input arguments
-
-    % experiment: Map container created by the get_details function
+function [DATA] = update_details(DATA, bonus_session)
+% UPDATE_DETAILS:  DATA is a struct created by the get_details() function,
+% bonus_session is an optional argument if the task pays a performance
+% bonus
     
-    % bonus_session: optional float for performance bonus. Default is 0.
-    
-% outputs
-
-    % saves experiment Map to raw_data directory
-
-%% code
-
-function [] = update_details(experiment, bonus_session)
-    
-
-    % variable declarations
-    global testing;
-    
-
-    % set  missing inputs
-    if nargin < 2
-        bonus_session = 0;  % default, no bonus
+    if nargin == 2
+        bonus = true;
+    else
+        bonus = false;
     end
-    
     
     % check input types
-    if ~isa(bonus_session, 'double')
-        error('bonus_session input must be a double')
+    if bonus
+        if ~isa(bonus_session, 'double')
+            error('bonus_session input must be a double')
+        end
     end
     
-    if ~isa(experiment, 'containers.Map')
-        error('experiment input must be containers.Map')
+    if ~isa(DATA, 'struct')
+        error('experiment input must be struct')
     end
-    
     
     % finish
-    experiment('finish') = datestr(now, 0);
-    
+    DATA.experiment.finish = datestr(now, 0);
+    DATA.experiment.duration = DATA.experiment.start - DATA.experiment.finish;
     
     % bonus
-    if isKey(experiment, 'bonus_session')
-        experiment('bonus_session') = bonus_session;  % store session bonus
+    if bonus
+        DATA.experiment.bonus_session = bonus_session;
+        DATA.experiment.bonus_total = DATA.experiment.bonus_total + bonus_session;
     end
-    
-    if isKey(experiment, 'bonus_total')
-        experiment('bonus_total') = experiment('bonus_total') + bonus_session;  % add session bonus to total
-    end
-    
     
     % save
-    if exist('raw_data', 'dir') ~= 7  % check for raw_data directory
-        mkdir('raw_data')  % make it if it doesn't exist
+    if exist([DATA.experiment.title, '_data'], 'dir') ~= 7  % check for raw_data directory
+        mkdir([DATA.experiment.title, '_data'])  % make it if it doesn't exist
     end
     
-    
-    save(experiment('data_filename'), 'experiment');
-    
+    save(DATA.experiment.filename, 'DATA');
     
 end

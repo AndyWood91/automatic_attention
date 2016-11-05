@@ -14,9 +14,6 @@ RandStream.setGlobalStream(RandStream('mt19937ar','seed',sum(100*clock)));
 
 trialStructure = makeTrialStructure; % get the trial structure
 
-% timeStart = GetSecs;  % Andy - in get_details
-% 
-% DATA = struct;  % Andy - passing in DATA from get_details
 DATA.results = zeros(size(trialStructure,1),9); % # of rows, 7 columns (SEE END)
 DATA.results(:,1:6) = trialStructure; % can write this part in now
 
@@ -62,29 +59,12 @@ winPos([2 4]) = [ScreenRes(2)-WinHeight ScreenRes(2)];
 %% Andy - in create_gabors now
 % gabor properties
 create_gabors;
-
-% gabor_size = 400;
 [myGrating, ~] = CreateProceduralGabor(main_window, gabor_size, gabor_size, 0, [BGcol/255 0], [], 5);
-% gabor_angles1 = [95 265 95 265 90 270 90 270];
-% gabor_angles2 = [95 265 95 265 95 265 95 265];
-% red = RGB('red');
-% green = RGB('green');
-% blue = RGB('blue');
-% black = RGB('black');
-% colours = [red; green; blue; black];
-% colours = colours(randperm(4),:); % randomises order of colours
-% gabor_colours = [colours(1,:); colours(1,:); colours(2,:); colours(2,:); colours(3,:); colours(3,:); colours(4,:); colours(4,:)];
 freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
 gabor_proportions = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
 GBpos = [50 MidV-gabor_size/2 50+gabor_size MidV+gabor_size/2; WinWidth-50-gabor_size MidV-gabor_size/2 WinWidth-50 MidV+gabor_size/2];
-%% Setup Instruction Screens
-% for a = 1:11
-%     instruction_file = ['Instructions/Slide', int2str(a), '.jpg'];
-%     instructions_slides(a) = Screen('MakeTexture', main_window, imread(instruction_file));
-% end
 
-%% 
-
+%%
 if runET == 1
     tetio_startTracking;
 end

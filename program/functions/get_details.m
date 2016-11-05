@@ -12,7 +12,6 @@ function [DATA] = get_details(title, conditions, sessions, bonus)
 
     % variable declarations
     start = datestr(now, 0);  % get current time
-%     global testing;  % turn on if debugging within another script
     testing = 1;  % 0 = experimental version, 1 = test version, turn off if debugging within another script
     
     % set missing inputs
