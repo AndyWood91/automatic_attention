@@ -17,4 +17,4 @@ sca;
 % automatic_attention functions
 % MainProc(main_window, screen_dimensions, instructions_slides, DATA, RGB);
 
-[DATA] = update_details(DATA);
+DATA = update_details(DATA);
