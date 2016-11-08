@@ -15,6 +15,6 @@ instructions_slides = create_instructions('.jpg', main_window);
 sca;
 
 % automatic_attention functions
-% MainProc(main_window, screen_dimensions, instructions_slides, DATA, RGB);
+MainProc(main_window, screen_dimensions, instructions_slides, DATA, RGB);
 
 DATA = update_details(DATA);
