@@ -176,6 +176,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     end
     RevInst = trialStructure(trial,6);
     
+    gaze_fixation;
     % ANDY - Gaze contingent fixation goes here
     
     % fixation dot
