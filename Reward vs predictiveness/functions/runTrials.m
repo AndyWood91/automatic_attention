@@ -1,40 +1,7 @@
-function [] = gaze_fixation(exptPhase)
 
-global TESTING
-TESTING = 0;
+function sessionPay = runTrials(exptPhase)
 
-%% Tetio Tracker Startup
-disp('Initializing tetio...');
-tetio_init();
-
-disp('Browsing for trackers...');
-trackerinfo = tetio_getTrackers();
-trackerId = trackerinfo(1).ProductId;
-
-fprintf('Connecting to tracker "%s"...\n', trackerId);
-tetio_connectTracker(trackerId)
-
-currentFrameRate = tetio_getFrameRate;
-fprintf('Connecteds!  Sample rate: %d Hz.\n', currentFrameRate);
-
-% check for data directories
-if ~exist('BehavData', 'dir')
-    mkdir('BehavData');
-end
-if ~exist('CalibrationDat', 'dir')
-    mkdir('CalibrationDat');
-end
-if ~exist('EyeData', 'dir')
-    mkdir('EyeData');
-end
-
-%%
-RGB = RGB_colours;
-[main_window, off_window, screen_dimensions] = PTB_screens(RGB('black'), RGB('white'));
-
-runPTBcalibration;
-commandwindow;
-
+global MainWindow
 global scr_centre DATA datafilename p_number
 global distract_col
 global white gray yellow
@@ -45,10 +12,7 @@ global fix_aoi_radius
 global instrCondition
 global softTimeoutDuration
 
-scr_centre(1) = screen_dimensions(2, 1);
-scr_centre(2) = screen_dimensions(2, 2);
-
-Screen('BlendFunction', main_window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); %This allows for transparent background on white dot
+Screen('BlendFunction', MainWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); %This allows for transparent background on white dot
 
 gamma = 0.2;    % Controls smoothing of displayed gaze location. Lower values give more smoothing
 
@@ -124,7 +88,7 @@ fixRect = [scr_centre(1) - fix_size/2    scr_centre(2) - fix_size/2   scr_centre
 fixAOIrect = [scr_centre(1) - fix_aoi_radius    scr_centre(2) - fix_aoi_radius   scr_centre(1) + fix_aoi_radius   scr_centre(2) + fix_aoi_radius];
 
 
-[diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, off_window] = setupStimuli(fix_size, gazePointRadius);
+[diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(fix_size, gazePointRadius);
 
 
 % Create a matrix containing the six stimulus locations, equally spaced
@@ -193,7 +157,7 @@ DATA.trialTimeouts = 0;
 
 trialEGarray = zeros(timeoutDuration(exptPhase + 1) * 2 * 300, 27);    % Preallocate memory for eyetracking data. Tracker samples at 300Hz, so multiplying timeout duration by 2*300 means there will be plenty of slots
 
-Screen('Flip', main_window);     % Clear anything that's on the screen
+Screen('Flip', MainWindow);     % Clear anything that's on the screen
 
 
 WaitSecs(initialPause);
@@ -223,27 +187,27 @@ for trial = 1 : numTrials
     
     postFixationPause = blankScreenAfterFixationPause(randi(3));
     
-%     Screen('FillRect', off_window, black);  % Clear the screen from the previous trial by drawing a black rectangle over the whole thing
-    Screen('DrawTexture', off_window, fixationTex, [], fixRect);
+%     Screen('FillRect', stimWindow, black);  % Clear the screen from the previous trial by drawing a black rectangle over the whole thing
+    Screen('DrawTexture', stimWindow, fixationTex, [], fixRect);
     
     for i = 1 : stimLocs
-        Screen('FillOval', off_window, gray, stimRect(i,:), perfectDiam);       % Draw stimulus circles
+        Screen('FillOval', stimWindow, gray, stimRect(i,:), perfectDiam);       % Draw stimulus circles
         aoiRadius(i) = distractorAOIradius;     % Set large AOIs around all locations (we'll change the AOI around the target location in a minute)
     end
-    Screen('FillOval', off_window, distract_col(distractType,:), stimRect(distractLoc,:), perfectDiam);      % Draw coloured circle in distractor location
-    Screen('DrawTexture', off_window, diamondTex, [], stimRect(targetLoc,:));       % Draw diamond in target location
+    Screen('FillOval', stimWindow, distract_col(distractType,:), stimRect(distractLoc,:), perfectDiam);      % Draw coloured circle in distractor location
+    Screen('DrawTexture', stimWindow, diamondTex, [], stimRect(targetLoc,:));       % Draw diamond in target location
     aoiRadius(targetLoc) = targetAOIradius;     % Set a special (small) AOI around the target
     
     
     tetio_startTracking; % start recording
     
     
-    Screen('Flip', main_window);     % Clear screen
+    Screen('Flip', MainWindow);     % Clear screen
     WaitSecs(briefPause);
 
     
-    Screen('DrawTexture', main_window, fixationAOIsprite, [], fixAOIrect);
-    Screen('DrawTexture', main_window, fixationTex, [], fixRect);
+    Screen('DrawTexture', MainWindow, fixationAOIsprite, [], fixAOIrect);
+    Screen('DrawTexture', MainWindow, fixationTex, [], fixRect);
     
     timeOnFixation = zeros(2);    % a slot for each stimulus location, and one for "everywhere else"
     stimSelected = 2;   % 1 = fixation cross, 2 = everywhere else
@@ -254,7 +218,7 @@ for trial = 1 : numTrials
     currentGazePoint = zeros(1,2);
     gazeCycle = 0;
 
-    startFixationTime = Screen('Flip', main_window, [], 1);     % Present fixation cross
+    startFixationTime = Screen('Flip', MainWindow, [], 1);     % Present fixation cross
     
     [~, ~, ts, ~] = tetio_readGazeData; % Empty eye tracker buffer
     startEyePeriod = double(ts(end));  % Take the timestamp of the last element in the buffer as the start of the trial. Need to convert to double so can divide by 10^6 later to change to seconds
@@ -262,8 +226,8 @@ for trial = 1 : numTrials
     
     
     while fixated_on_fixation_cross == 0
-        Screen('DrawTexture', main_window, fixationAOIsprite, [], fixAOIrect);   % Redraw fixation cross and AOI, and draw gaze point on top of that
-        Screen('DrawTexture', main_window, fixationTex, [], fixRect);
+        Screen('DrawTexture', MainWindow, fixationAOIsprite, [], fixAOIrect);   % Redraw fixation cross and AOI, and draw gaze point on top of that
+        Screen('DrawTexture', MainWindow, fixationTex, [], fixRect);
         
         WaitSecs(fixationPollingInterval);      % Pause between updates of eye position
         [lefteye, righteye, ts, ~] = tetio_readGazeData;    % Get eye-tracker data since previous call
@@ -281,8 +245,8 @@ for trial = 1 : numTrials
                 else
                     currentGazePoint = (1 - gamma) * currentGazePoint + gamma * [eyeX, eyeY];       % Calculate smoothed gaze location using weighted moving average of current and previous locations
                     
-                    Screen('DrawTexture', main_window, gazePointSprite, [], [currentGazePoint(1) - gazePointRadius, currentGazePoint(2) - gazePointRadius, currentGazePoint(1) + gazePointRadius, currentGazePoint(2) + gazePointRadius]);
-                    Screen('DrawingFinished', main_window);
+                    Screen('DrawTexture', MainWindow, gazePointSprite, [], [currentGazePoint(1) - gazePointRadius, currentGazePoint(2) - gazePointRadius, currentGazePoint(1) + gazePointRadius, currentGazePoint(2) + gazePointRadius]);
+                    Screen('DrawingFinished', MainWindow);
                     
                     stimSelected = checkEyesOnFixation(eyeX, eyeY);     % If some gaze has been detected, check whether this is on the fixation cross, or "everywhere else"
                     
@@ -306,28 +270,28 @@ for trial = 1 : numTrials
             fixationTimeout = 1;
         end
         
-        Screen('Flip', main_window);     % Update display with gaze point
+        Screen('Flip', MainWindow);     % Update display with gaze point
         
     end
     
     fixationTime = GetSecs - startFixationTime;      % Length of fixation period in ms
     fixationPropGoodSamples = 1 - double(fixationBadSamples) / double(gazeCycle);
     
-    Screen('DrawTexture', main_window, colouredFixationAOIsprite, [], fixAOIrect);
-    Screen('DrawTexture', main_window, colouredFixationTex, [], fixRect);
-    Screen('Flip', main_window);     % Present coloured fixation cross
-    
+    Screen('DrawTexture', MainWindow, colouredFixationAOIsprite, [], fixAOIrect);
+    Screen('DrawTexture', MainWindow, colouredFixationTex, [], fixRect);
+    Screen('Flip', MainWindow);     % Present coloured fixation cross
     
     WaitSecs(yellowFixationDuration);
     
     tetio_stopTracking; % reset tracker in case it ballsed up during the fixation period
     tetio_startTracking;
     
-    Screen('Flip', main_window);     % Show fixation cross without circle
+    Screen('Flip', MainWindow);     % Show fixation cross without circle
     
-    WaitSecs(postFixationPause);
+    tetio_stopTracking; % stop the tracker
+    WaitSecs(2);
     
-    % CUT HERE I THINK
+
     
     trialEnd = 0;
     timeOnLoc = zeros(1, stimLocs + 1);    % a slot for each stimulus location, and one for "everywhere else"
@@ -337,11 +301,9 @@ for trial = 1 : numTrials
     gazeCycle = 0;
     arrayRowCounter = 2;    % Used to write EG data to the correct rows of an array. Starts at 2 because we write the first row in separately below (line marked ***)
     
-    tetio_stopTracking; % stop the tracker
-
-%     Screen('DrawTexture', main_window, off_window);      % Copy stimuli to main window
+%     Screen('DrawTexture', MainWindow, stimWindow);      % Copy stimuli to main window
 %     
-%     startTrialTime = Screen('Flip', main_window, [], 1);      % Present stimuli, and record start time (st) when they are presented.
+%     startTrialTime = Screen('Flip', MainWindow, [], 1);      % Present stimuli, and record start time (st) when they are presented.
 %     
 %     [lefteye, righteye, ts, ~] = tetio_readGazeData; % Empty eye tracker buffer
 %     
@@ -388,7 +350,7 @@ for trial = 1 : numTrials
 %     
 %     rt = GetSecs - startTrialTime;      % Response time
 %     
-%     Screen('Flip', main_window);
+%     Screen('Flip', MainWindow);
 %     
 %     tetio_stopTracking; % stop the tracker
 %     
@@ -461,20 +423,20 @@ for trial = 1 : numTrials
 %             end
 %                 
 %             
-%             Screen('TextSize', main_window, 35);
-%             DrawFormattedText(main_window, [separatethousands(sessionPay, ','), ' points total'], 'center', 760, white);
+%             Screen('TextSize', MainWindow, 35);
+%             DrawFormattedText(MainWindow, [separatethousands(sessionPay, ','), ' points total'], 'center', 760, white);
 %             
 %         end
 %     end
 %     
 %     
-%     Screen('TextSize', main_window, 54);
-%     DrawFormattedText(main_window, fbStr, 'center', 'center', yellow, [], [], [], 1.3);
+%     Screen('TextSize', MainWindow, 54);
+%     DrawFormattedText(MainWindow, fbStr, 'center', 'center', yellow, [], [], [], 1.3);
 %     
 %     
-    Screen('Flip', main_window);
-    
-    WaitSecs(FB_duration);
+%     Screen('Flip', MainWindow);
+%     
+%     WaitSecs(FB_duration);
 
     
     if exptPhase == 0
@@ -485,6 +447,9 @@ for trial = 1 : numTrials
 %         end
 %         
 %         DATA.practrialInfo(trial,:) = trialData(:);
+
+% ANDY - shouldn't need to add this back in if we're alreaedy saving the
+% trail data elsewhere
     
     
     else
@@ -510,7 +475,7 @@ for trial = 1 : numTrials
     
     
     RestrictKeysForKbCheck(KbName('c'));   % Only accept C key to begin calibration
-    startITItime = Screen('Flip', main_window);
+    startITItime = Screen('Flip', MainWindow);
     
     [~, keyCode, ~] = KbWait([], 2, startITItime + itiDuration);    % Wait for ITI duration while monitoring keyboard
     
@@ -520,7 +485,7 @@ for trial = 1 : numTrials
     % carry on with the experiment
     if sum(keyCode) > 0
         take_a_break(breakDuration, initialPause, 1, sessionPay, 1);
-        [diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, off_window] = setupStimuli(fix_size, gazePointRadius);
+        [diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(fix_size, gazePointRadius);
     end
    
     
@@ -541,7 +506,7 @@ for trial = 1 : numTrials
                 take_a_break(breakDuration, initialPause, 0, sessionPay, 0);
             else
                 take_a_break(breakDuration, initialPause, 1, sessionPay, 0);
-                [diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, off_window] = setupStimuli(fix_size, gazePointRadius);
+                [diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(fix_size, gazePointRadius);
             end
             
             blockPay = 0;
@@ -562,7 +527,7 @@ Screen('Close', colouredFixationTex);
 Screen('Close', fixationAOIsprite);
 Screen('Close', colouredFixationAOIsprite);
 Screen('Close', gazePointSprite);
-Screen('Close', off_window);
+Screen('Close', stimWindow);
 
 
 end
@@ -655,7 +620,7 @@ end
 
 function take_a_break(breakDur, pauseDur, runCalib, totalPointsSoFar, extraordinaryCalib)
 
-global main_window white
+global MainWindow white
 
 if extraordinaryCalib
     runPTBcalibration;
@@ -664,17 +629,17 @@ else
     
     if runCalib == 0
         
-        [~, ny, ~] = DrawFormattedText(main_window, ['Time for a break\n\nSit back, relax for a moment! You will be able to carry on in ', num2str(breakDur),' seconds\n\nRemember that you should be trying to move your eyes to the diamond as quickly and as accurately as possible!'], 'center', 'center', white, 50, [],[], 1.1);
+        [~, ny, ~] = DrawFormattedText(MainWindow, ['Time for a break\n\nSit back, relax for a moment! You will be able to carry on in ', num2str(breakDur),' seconds\n\nRemember that you should be trying to move your eyes to the diamond as quickly and as accurately as possible!'], 'center', 'center', white, 50, [],[], 1.1);
         
-        DrawFormattedText(main_window, ['Total so far = ', separatethousands(totalPointsSoFar, ','), ' points'], 'center', ny + 150, white, 50, [],[], 1.1);
+        DrawFormattedText(MainWindow, ['Total so far = ', separatethousands(totalPointsSoFar, ','), ' points'], 'center', ny + 150, white, 50, [],[], 1.1);
         
-        Screen(main_window, 'Flip');
+        Screen(MainWindow, 'Flip');
         WaitSecs(breakDur);
         
     else
         
-        DrawFormattedText(main_window, 'Please fetch the experimenter', 'center', 'center', white);
-        Screen(main_window, 'Flip');
+        DrawFormattedText(MainWindow, 'Please fetch the experimenter', 'center', 'center', white);
+        Screen(MainWindow, 'Flip');
         RestrictKeysForKbCheck(KbName('c'));   % Only accept C key to begin calibration
         KbWait([], 2);
         RestrictKeysForKbCheck([]);   % Re-enable all keys
@@ -686,59 +651,12 @@ end
 
 RestrictKeysForKbCheck(KbName('Space'));   % Only accept spacebar
 
-DrawFormattedText(main_window, 'Please put your chin back in the chinrest,\nand press the spacebar when you are ready to continue', 'center', 'center' , white, [], [], [], 1.1);
-Screen(main_window, 'Flip');
+DrawFormattedText(MainWindow, 'Please put your chin back in the chinrest,\nand press the spacebar when you are ready to continue', 'center', 'center' , white, [], [], [], 1.1);
+Screen(MainWindow, 'Flip');
 
 KbWait([], 2);
-Screen(main_window, 'Flip');
+Screen(MainWindow, 'Flip');
 
 WaitSecs(pauseDur);
 
-end
-
-function [diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, off_window] = setupStimuli(fs, gpr)
-
-global main_window
-global fix_aoi_radius
-global white black gray yellow
-global stim_size
-
-perfectDiam = stim_size + 10;   % Used in FillOval to increase drawing speed
-
-% This plots the points of a large diamond, that will be filled with colour
-d_pts = [stim_size/2, 0;
-    stim_size, stim_size/2;
-    stim_size/2, stim_size;
-    0, stim_size/2];
-
-
-% Create an offscreen window, and draw the two diamonds onto it to create a diamond-shaped frame.
-diamondTex = Screen('OpenOffscreenWindow', main_window, black, [0 0 stim_size stim_size]);
-Screen('FillPoly', diamondTex, gray, d_pts);
-
-% Create an offscreen window, and draw the fixation cross in it.
-fixationTex = Screen('OpenOffscreenWindow', main_window, black, [0 0 fs fs]);
-Screen('DrawLine', fixationTex, white, 0, fs/2, fs, fs/2, 2);
-Screen('DrawLine', fixationTex, white, fs/2, 0, fs/2, fs, 2);
-
-
-colouredFixationTex = Screen('OpenOffscreenWindow', main_window, black, [0 0 fs fs]);
-Screen('DrawLine', colouredFixationTex, yellow, 0, fs/2, fs, fs/2, 4);
-Screen('DrawLine', colouredFixationTex, yellow, fs/2, 0, fs/2, fs, 4);
-
-% Create a sprite for the circular AOI around the fixation cross
-fixationAOIsprite = Screen('OpenOffscreenWindow', main_window, black, [0 0  fix_aoi_radius*2  fix_aoi_radius*2]);
-Screen('FrameOval', fixationAOIsprite, white, [], 1, 1);   % Draw fixation aoi circle
-
-colouredFixationAOIsprite = Screen('OpenOffscreenWindow', main_window, black, [0 0  fix_aoi_radius*2  fix_aoi_radius*2]);
-Screen('FrameOval', colouredFixationAOIsprite, yellow, [], 2, 2);   % Draw fixation aoi circle
-
-
-% Create a marker for eye gaze
-gazePointSprite = Screen('OpenOffscreenWindow', main_window, [0 0 0 0], [0 0 gpr*2 gpr*2]);
-Screen('FillOval', gazePointSprite, [yellow 255], [0 0 gpr*2 gpr*2], perfectDiam);       % Draw stimulus circles
-
-% Create a full-size offscreen window that will be used for drawing all
-% stimuli and targets (and fixation cross) into
-off_window = Screen('OpenOffscreenWindow', main_window, black);
 end

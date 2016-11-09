@@ -9,10 +9,6 @@ instructStr2 = 'Then a set of shapes will appear; an example is shown below. You
 show_Instructions(1, instructStr1);
 show_Instructions(2, instructStr2);
 
-Screen('TextSize', MainWindow, 32);
-Screen('TextStyle', MainWindow, 1);
-Screen('TextFont', MainWindow, 'Courier');
-
 DrawFormattedText(MainWindow, 'Tell the experimenter when you are ready to begin', 'center', 'center' , white);
 Screen(MainWindow, 'Flip');
 
@@ -34,17 +30,12 @@ exImageRect = [scr_centre(1) - x/2    scr_centre(2)-50    scr_centre(1) + x/2   
 
 RestrictKeysForKbCheck(KbName('Space'));   % Only accept spacebar
 
+oldTextSize = Screen('TextSize', MainWindow, 44);
+oldTextStyle = Screen('TextStyle', MainWindow, 1);
 
-instrWin = Screen('OpenOffscreenWindow', MainWindow, black);
-Screen('TextSize', instrWin, 32);
-Screen('TextStyle', instrWin, 1);
-
-[~, ~, instrBox] = DrawFormattedText(instrWin, insStr, 'centerblock', 'center' , white, 60, [], [], 1.5);
-instrBox_width = instrBox(3) - instrBox(1);
-instrBox_height = instrBox(4) - instrBox(2);
 textTop = 100;
-destInstrBox = [scr_centre(1) - instrBox_width / 2   textTop   scr_centre(1) + instrBox_width / 2   textTop +  instrBox_height];
-Screen('DrawTexture', MainWindow, instrWin, instrBox, destInstrBox);
+characterWrap = 68;
+DrawFormattedText(MainWindow, insStr, 80, textTop, white, characterWrap, [], [], 1.1);
 
 if instrTrial == 1
     ima1=imread('image1.jpg', 'jpg');
@@ -52,7 +43,7 @@ if instrTrial == 1
     Screen('PutImage', MainWindow, ima1, exImageRect); % put image on screen
     Screen(MainWindow, 'Flip');
     KbWait([], 2);
-    Screen('DrawTexture', MainWindow, instrWin, instrBox, destInstrBox);
+    DrawFormattedText(MainWindow, insStr, 80, textTop, white, characterWrap, [], [], 1.1);
     Screen('PutImage', MainWindow, ima2, exImageRect); % put image on screen
     
 elseif instrTrial == 2
@@ -66,6 +57,8 @@ Screen(MainWindow, 'Flip');
 
 KbWait([], 2);
 
-Screen('Close', instrWin);
+Screen('TextSize', MainWindow, oldTextSize);
+Screen('TextStyle', MainWindow, oldTextStyle);
+
 
 end

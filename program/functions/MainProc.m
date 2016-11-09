@@ -135,6 +135,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     
     % ANDY - Gaze contingent fixation goes here
     
+    
     % fixation dot
     Screen('FillRect', main_window, RGB('white'));
     Screen('Flip', main_window);
