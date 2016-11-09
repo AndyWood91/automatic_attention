@@ -134,34 +134,38 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     RevInst = trialStructure(trial,6);
     
     % ANDY - Gaze contingent fixation goes here
+%% START INSERTING GAZE CONTINGENT FIXATION
+% all of the runTrials loop
+
     
     
-    % fixation dot
-    Screen('FillRect', main_window, RGB('white'));
-    Screen('Flip', main_window);
-    
-    Screen('FillOval', main_window , fixCol, [MidH-fixSize MidV-fixSize MidH+fixSize MidV+fixSize])    
-    tempTS(1) = Screen('Flip', main_window);
-    WaitSecs(fixTime);
-    % screenshot
+%%    cutting this out for gaze_contingent fixation
+%     fixation dot
+%     Screen('FillRect', main_window, RGB('white'));
+%     Screen('Flip', main_window);
+%     
+%     Screen('FillOval', main_window , fixCol, [MidH-fixSize MidV-fixSize MidH+fixSize MidV+fixSize])    
+%     tempTS(1) = Screen('Flip', main_window);
+%     WaitSecs(fixTime);
+%     screenshot
 %     imageArray=Screen('GetImage', main_window);
 %     imwrite(imageArray,'ss1','jpg')
-    
-    if fix_to_ITI_time > 0
-        Screen('Flip', main_window); % blank 
-        WaitSecs(fix_to_ITI_time + rand * .5);
-    end
-    
-    % Draw normal/reversal instruction
-    if RevInst == 0
-        Screen('FillOval', main_window , iCol, [MidH-iSize MidV-iSize MidH+iSize MidV+iSize]);
-    elseif RevInst == 1
-        Screen('FillRect', main_window , iCol, [MidH-iSize MidV-iSize MidH+iSize MidV+iSize]);
-    end
-    Screen('FillOval', main_window , fixCol, [MidH-fixSize MidV-fixSize MidH+fixSize MidV+fixSize]); 
-    tempTS(2) = Screen('Flip', main_window);
-    WaitSecs(instTime);
-        
+%     
+%     if fix_to_ITI_time > 0
+%         Screen('Flip', main_window); % blank 
+%         WaitSecs(fix_to_ITI_time + rand * .5);
+%     end
+%     
+%     Draw normal/reversal instruction
+%     if RevInst == 0
+%         Screen('FillOval', main_window , iCol, [MidH-iSize MidV-iSize MidH+iSize MidV+iSize]);
+%     elseif RevInst == 1
+%         Screen('FillRect', main_window , iCol, [MidH-iSize MidV-iSize MidH+iSize MidV+iSize]);
+%     end
+%     Screen('FillOval', main_window , fixCol, [MidH-fixSize MidV-fixSize MidH+fixSize MidV+fixSize]); 
+%     tempTS(2) = Screen('Flip', main_window);
+%     WaitSecs(instTime);
+%%       
     % Draw gabors on screen
     for c = 1:2
         Screen('DrawTexture', main_window, myGrating, [], GBpos(c,:), trialAngles(circleOrder(c)), [], [], gabor_colours(circleOrder(c),:), [], kPsychDontDoRotation, gabor_proportions);

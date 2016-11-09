@@ -1,4 +1,8 @@
-function [main_window, off_window, screen_dimensions] = PTB_screens(background, text)
+function [main_window, off_window, screen_dimensions] = PTB_screens(background, text, tracking)
+
+    if nargin <3
+        tracking = true;
+    end
     
     global TESTING
     
@@ -9,12 +13,19 @@ function [main_window, off_window, screen_dimensions] = PTB_screens(background, 
     
     % PTB window
     if TESTING == 1
-        Screen('Preference', 'SkipSyncTests', 1);  % skip PTB calibration
-        PTB_screen = [0 0 screen_width*.75 screen_height*.75];  % three quarter screen
+        Screen('Preference', 'SkipSyncTests', 2);      % Skips the Psychtoolbox calibrations - REMOVE THIS WHEN RUNNING FOR REAL!
+        Screen('Preference', 'VisualDebuglevel', 3);    % Hides the hammertime PTB startup screen
+%         PTB_screen = [0 0 screen_width*.75 screen_height*.75];  % three quarter screen
+        PTB_screen = [0 0 screen_width screen_height];  % full screen
+
     elseif TESTING == 0
         PTB_screen = [0 0 screen_width screen_height];  % full screen
     else
         error('global variable TESTING is set incorrectly');
+    end
+    
+    if tracking == true
+        %
     end
     
     % PTB windows

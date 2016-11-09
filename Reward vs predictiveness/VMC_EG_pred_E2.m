@@ -77,9 +77,6 @@ if eyeVersion
 end
 
 
-if ~exist('BehavData', 'dir')
-    mkdir('BehavData');
-end
 if ~exist('CalibrationDat', 'dir')
     mkdir('CalibrationDat');
 end
@@ -245,10 +242,11 @@ if eyeVersion
 end
 
 % pressSpaceToBegin;
+gaze_contingent_fixation;
 
-[~] = runTrials(0);     % ANDY - this now just shows the fixation cross
+% [~] = runTrials(0);     % ANDY - this now just shows the fixation cross
 
-save(datafilename, 'DATA');
+% save(datafilename, 'DATA');
 
 
 % DrawFormattedText(MainWindow, 'Please let the experimenter know\n\nyou are ready to continue', 'center', 'center' , white);
