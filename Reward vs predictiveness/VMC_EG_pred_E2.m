@@ -1,7 +1,8 @@
 clear all;
 
 % global TESTING
-% TESTING = 1;
+global TESTING
+TESTING = 1;
 
 Screen('Preference', 'SkipSyncTests', 2);      % Skips the Psychtoolbox calibrations - REMOVE THIS WHEN RUNNING FOR REAL!
 Screen('Preference', 'DefaultFontName', 'Courier New');
@@ -15,7 +16,7 @@ functionFoldername = fullfile(pwd, 'functions');    % Generate file path for "fu
 addpath(genpath(functionFoldername));       % Then add path to this folder and all subfolders
 
 
-global MainWindow screenNum
+global screenNum MainWindow
 global scr_centre DATA datafilename p_number
 global centOrCents
 global screenRes
@@ -27,6 +28,8 @@ global instrCondition
 global starting_total
 global awareInstrPause
 global stim_size
+
+RGB = RGB_colours();
 
 commandwindow;
 
@@ -187,6 +190,8 @@ yellow = [255 255 0];
 global bgdColour
 bgdColour = black;
 
+% [MainWindow, off_window, screen_dimensions] = PTB_screens(RGB('white'), RGB('black'), true);
+
 MainWindow = Screen(screenNum, 'OpenWindow', bgdColour);
 Screen('TextFont', MainWindow, 'Courier New');
 Screen('TextSize', MainWindow, 46);
@@ -238,13 +243,12 @@ end
 % initialInstructions;
 
 if eyeVersion
-    runPTBcalibration;
+    runPTBcalibration(MainWindow);
 end
 
 % pressSpaceToBegin;
-gaze_contingent_fixation;
-
-% [~] = runTrials(0);     % ANDY - this now just shows the fixation cross
+% gaze_contingent_fixation(MainWindow);
+[~] = runTrials(0);     % ANDY - this now just shows the fixation cross
 
 % save(datafilename, 'DATA');
 

@@ -1,39 +1,41 @@
+function [] = runPTBcalibration(main_window)
 
-global Calib calibCoordinatesX calibCoordinatesY
-global p_number
-global calibrationNum
-global MainWindow
-
-
-oldTextFont = Screen('TextFont', MainWindow);
-oldTextSize = Screen('TextSize', MainWindow);
-oldTextStyle = Screen('TextStyle', MainWindow);
+    global Calib calibCoordinatesX calibCoordinatesY
+    global p_number
+    global calibrationNum
 
 
-[scrWidth, scrHeight] = Screen('WindowSize', MainWindow);
+    oldTextFont = Screen('TextFont', main_window);
+    oldTextSize = Screen('TextSize', main_window);
+    oldTextStyle = Screen('TextStyle', main_window);
 
-calibCoordinatesX = scrWidth * [0.2, 0.8, 0.5, 0.8, 0.2];
-calibCoordinatesY = scrHeight * [0.2, 0.2, 0.5, 0.8, 0.8];
+
+    [scrWidth, scrHeight] = Screen('WindowSize', main_window);
+
+    calibCoordinatesX = scrWidth * [0.2, 0.8, 0.5, 0.8, 0.2];
+    calibCoordinatesY = scrHeight * [0.2, 0.2, 0.5, 0.8, 0.8];
 
 
-%% This is the calibration stage
-SetCalibParamsPTB; 
+    %% This is the calibration stage
+    SetCalibParamsPTB; 
 
-TrackStatusPTB;
+    TrackStatusPTB;
 
-calibPoints = HandleCalibWorkflowPsychToolBox(Calib); % calibPoints is what you will want to save (or add to your data file)
+    calibPoints = HandleCalibWorkflowPsychToolBox(Calib); % calibPoints is what you will want to save (or add to your data file)
 
-%% Closes everything down
+    %% Closes everything down
 
-calibrationNum = calibrationNum + 1;
+    calibrationNum = calibrationNum + 1;
 
-filepath = ['CalibrationDat\P', num2str(p_number), '_Cal', num2str(calibrationNum)];
+    filepath = ['CalibrationDat\P', num2str(p_number), '_Cal', num2str(calibrationNum)];
 
-save(filepath,'calibPoints')
+    save(filepath,'calibPoints')
 
-clear calibPoints;
-clear filePath;
+    clear calibPoints;
+    clear filePath;
 
-Screen('TextFont', MainWindow, oldTextFont);
-Screen('TextSize', MainWindow, oldTextSize);
-Screen('TextStyle', MainWindow, oldTextStyle);
+    Screen('TextFont', main_window, oldTextFont);
+    Screen('TextSize', main_window, oldTextSize);
+    Screen('TextStyle', main_window, oldTextStyle);
+    
+end
