@@ -1,7 +1,7 @@
 function [] = gaze_contingent_fixation(main_window)
 % GAZE_CONTINGENT_FIXATION: 
 
-global scr_centre DATA datafilename p_number
+global scr_centre DATA p_number
 global stimLocs
 global fix_aoi_radius
 global softTimeoutDuration
@@ -35,22 +35,6 @@ junkFixationPeriod = 0.1;   % Period to throw away at start of fixation before g
 junkGazeCycles = junkFixationPeriod / trialPollingInterval;
 
 
-numDistractType = 4;        % Four types of distractor-present trial (P-med, P-med, NP-high, NP-low)
-numDistractTrialsPerBlock = 5;     % 5
-numAbsentType = 2;      % Two types of distractor absent trial (high reward and low reward)
-numAbsentTrialsPerBlock = 2;        % 2
-
-
-exptTrialsPerBlock = numDistractType * numDistractTrialsPerBlock + numAbsentType * numAbsentTrialsPerBlock;    % Gives 24
-
-exptTrialsBeforeBreak = 2 * exptTrialsPerBlock;     % 2 * exptTrialsPerBlock = 48
-
-exptTrialsBeforeCalibration = 99999;  % Used to be 10 * exptTrialsPerBlock
-
-pracTrials = 8;    % 8
-exptTrials = 20 * exptTrialsPerBlock;    % 20 * exptTrialsPerBlock = 480
-
-
 stimLocs = 6;       % Number of stimulus locations
 
 fix_size = 20;      % This is the side length of the fixation cross
@@ -70,19 +54,6 @@ fixAOIrect = [scr_centre(1) - fix_aoi_radius    scr_centre(2) - fix_aoi_radius  
 
 
 [diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(fix_size, gazePointRadius);
-
-
-if exptPhase == 0
-    numTrials = pracTrials;
-    
-    distractArray = zeros(1, pracTrials);
-    distractArray(1 : pracTrials) = 7;
-    
-else
-    numTrials = exptTrials;
-    
-   
-end
 
 trialEGarray = zeros(timeoutDuration(exptPhase + 1) * 2 * 300, 27);    % Preallocate memory for eyetracking data. Tracker samples at 300Hz, so multiplying timeout duration by 2*300 means there will be plenty of slots
 
@@ -374,7 +345,6 @@ WaitSecs(initialPause);
         
         EGdatafilename = ['EyeData\P', num2str(p_number), '\GazeDataP', num2str(p_number), 'T', num2str(trial), '.mat'];
         
-        savedEGdata = trialEGarray(1:arrayRowCounter-1, :);     % Trim off empty, excess rows and save EG data
         save(EGdatafilename, 'savedEGdata');
     end
     
@@ -396,38 +366,7 @@ WaitSecs(initialPause);
    
     
     
-    if exptPhase == 1
-
-        if mod(trial, exptTrialsPerBlock) == 0
-            shuffled_distractArray = shuffleTrialorder(distractArray, exptPhase);     % Re-shuffle order of distractors
-            trialCounter = 0;
-            DATA.blocksCompleted = block;
-            block = block + 1;
-        end
-        
-        if (mod(trial, exptTrialsBeforeBreak) == 0 && trial ~= numTrials);
-            save(datafilename, 'DATA');
-            
-            if mod(trial, exptTrialsBeforeCalibration) ~= 0;
-                take_a_break(breakDuration, initialPause, 0, sessionPay, 0);
-            else
-                take_a_break(breakDuration, initialPause, 1, sessionPay, 0);
-                [diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(fix_size, gazePointRadius);
-            end
-            
-            blockPay = 0;
-            blockOmissionCounter = 0;
-            blockOmissionReward = 0;
-            trials_since_break = 0;
-        end
-        
-    end
-    
-    save(datafilename, 'DATA');
-    
-% end  % end trial loop
-
-
+ 
 Screen('Close', diamondTex);
 Screen('Close', fixationTex);
 Screen('Close', colouredFixationTex);
@@ -506,64 +445,3 @@ end
 
 
 
-% function shuffArray = shuffleTrialorder(inArray,ePhase)
-% 
-% acceptShuffle = 0;
-% 
-% while acceptShuffle == 0
-%     shuffArray = inArray(randperm(length(inArray)));     % Shuffle order of distractors
-%     acceptShuffle = 1;   % Shuffle always OK in practice phase
-%     if ePhase == 1
-%         if shuffArray(1) > 2 || shuffArray(2) > 2
-%             acceptShuffle = 0;   % Reshuffle if either of the first two trials (which may well be discarded) are rare types
-%         end
-%     end
-% end
-% 
-% end
-
-
-
-
-% function take_a_break(breakDur, pauseDur, runCalib, totalPointsSoFar, extraordinaryCalib)
-% 
-% global main_window white
-% 
-% if extraordinaryCalib
-%     runPTBcalibration;
-%     
-% else    
-%     
-%     if runCalib == 0
-%         
-%         [~, ny, ~] = DrawFormattedText(main_window, ['Time for a break\n\nSit back, relax for a moment! You will be able to carry on in ', num2str(breakDur),' seconds\n\nRemember that you should be trying to move your eyes to the diamond as quickly and as accurately as possible!'], 'center', 'center', white, 50, [],[], 1.1);
-%         
-%         DrawFormattedText(main_window, ['Total so far = ', separatethousands(totalPointsSoFar, ','), ' points'], 'center', ny + 150, white, 50, [],[], 1.1);
-%         
-%         Screen(main_window, 'Flip');
-%         WaitSecs(breakDur);
-%         
-%     else
-%         
-%         DrawFormattedText(main_window, 'Please fetch the experimenter', 'center', 'center', white);
-%         Screen(main_window, 'Flip');
-%         RestrictKeysForKbCheck(KbName('c'));   % Only accept C key to begin calibration
-%         KbWait([], 2);
-%         RestrictKeysForKbCheck([]);   % Re-enable all keys
-%         runPTBcalibration;
-%         
-%     end    
-%     
-% end
-% 
-% RestrictKeysForKbCheck(KbName('Space'));   % Only accept spacebar
-% 
-% DrawFormattedText(main_window, 'Please put your chin back in the chinrest,\nand press the spacebar when you are ready to continue', 'center', 'center' , white, [], [], [], 1.1);
-% Screen(main_window, 'Flip');
-% 
-% KbWait([], 2);
-% Screen(main_window, 'Flip');
-% 
-% WaitSecs(pauseDur);
-% 
-% end
