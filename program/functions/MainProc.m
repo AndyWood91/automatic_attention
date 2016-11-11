@@ -1,6 +1,6 @@
 function [] = MainProc(main_window, screen_dimensions, instructions_slides, DATA, RGB)
 
-test_rectangle = [0 0 screen_dimensions(1, 1)*0.75 screen_dimensions(1, 2)*0.75];
+test_rectangle = [0 0 screen_dimensions(1, 1) screen_dimensions(1, 2)];
 
 runET = 0;
 

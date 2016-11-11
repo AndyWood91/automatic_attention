@@ -2,13 +2,8 @@ function [] = gaze_contingent_fixation(main_window)
 % GAZE_CONTINGENT_FIXATION: 
 
 global scr_centre DATA datafilename p_number
-global distract_col
-global white gray yellow
-global bigMultiplier smallMultiplier medMultiplier
-global stim_size stimLocs
-global stimCentre aoiRadius
+global stimLocs
 global fix_aoi_radius
-global instrCondition
 global softTimeoutDuration
 
 exptPhase = 0;
@@ -24,16 +19,12 @@ fixationTimeoutDuration = 5;    % 5 fixation timeout duration
 
 itiDuration = 1.2;            % 1.2
 briefPause = 0.1;       % 0.1
-feedbackDuration = [0.7, 2.5, 1.5];       %[0.001, 0.001, 0.001]    [0.7, 2.5, 1.5]  FB duration: Practice, first block of expt phase, later in expt phase
 
 yellowFixationDuration = 0.3;     % Duration for which fixation cross turns yellow to indicate trial about to start
 blankScreenAfterFixationPause = [0.6, 0.7, 0.8];        % [0.6, 0.7, 0.8] Blank screen after fixation disappears (sampled randomly)
 
 initialPause = 2.5;   % 2.5 ***
 breakDuration = 20;  % 20 ***
-
-requiredFixationTime = 0.1;     % Time that target must be fixated for trial to be successful
-omissionTimeLimit = 0;          % Dwell time on distractor that means this will be an omission trial
 
 fixationFixationTime = 0.7;       % Time that fixation cross must be fixated for trial to begin
 
@@ -61,23 +52,12 @@ exptTrials = 20 * exptTrialsPerBlock;    % 20 * exptTrialsPerBlock = 480
 
 
 stimLocs = 6;       % Number of stimulus locations
-perfectDiam = stim_size + 10;   % Used in FillOval to increase drawing speed
-
-circ_diam = 200;    % Diameter of imaginary circle on which stimuli are positioned
 
 fix_size = 20;      % This is the side length of the fixation cross
 fix_aoi_radius = fix_size * 3;
 
 gazePointRadius = 10;
 
-
-winMultiplier = zeros(numDistractType + numAbsentType, 1);     % winMultiplier is a bad name now; it's actually the amount that they win
-winMultiplier(1) = medMultiplier;         % Predictive distractor
-winMultiplier(2) = medMultiplier;     % Predictive distractor
-winMultiplier(3) = bigMultiplier;         % NP distractor, big win
-winMultiplier(4) = smallMultiplier;     % NP distractor, small win
-winMultiplier(5) = bigMultiplier;         % No distractor, big win
-winMultiplier(6) = smallMultiplier;     % No distractor, small win
 
 
 
@@ -92,24 +72,6 @@ fixAOIrect = [scr_centre(1) - fix_aoi_radius    scr_centre(2) - fix_aoi_radius  
 [diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(fix_size, gazePointRadius);
 
 
-% Create a matrix containing the six stimulus locations, equally spaced
-% around an imaginary circle of diameter circ_diam
-stimRect = zeros(stimLocs,4);
-
-for i = 0 : stimLocs - 1    % Define rects for stimuli and line segments
-    stimRect(i+1,:) = [scr_centre(1) - circ_diam * sin(i*2*pi/stimLocs) - stim_size / 2   scr_centre(2) - circ_diam * cos(i*2*pi/stimLocs) - stim_size / 2   scr_centre(1) - circ_diam * sin(i*2*pi/stimLocs) + stim_size / 2   scr_centre(2) - circ_diam * cos(i*2*pi/stimLocs) + stim_size / 2];
-end
-
-stimCentre = zeros(stimLocs, 2);
-for i = 1 : stimLocs
-    stimCentre(i,:) = [stimRect(i,1) + stim_size / 2,  stimRect(i,2) + stim_size / 2];
-end
-distractorAOIradius = 2 * (circ_diam / 2) * sin(pi / stimLocs);       % This gives circular AOIs that are tangent to each other
-targetAOIradius = round(stim_size * 0.75);        % This gives a smaller AOI that will be used to determine target fixations on each trial
-
-aoiRadius = zeros(stimLocs);
-
-
 if exptPhase == 0
     numTrials = pracTrials;
     
@@ -119,69 +81,17 @@ if exptPhase == 0
 else
     numTrials = exptTrials;
     
-%     distractArray = zeros(1,exptTrialsPerBlock);
-%     
-%     loopStart = 1;
-%     
-%     for jj = 1 : numDistractType      % Predictive and nonpredictive cue
-%         loopEnd = loopStart + numDistractTrialsPerBlock - 1;
-%         for ii = loopStart : loopEnd
-%             distractArray(ii) = jj;
-%         end
-%         loopStart = loopEnd + 1;
-%     end
-%     
-%     
-%     for jj = numDistractType + 1 : numDistractType + numAbsentType      % Distractor absent trials
-%         loopEnd = loopStart + numAbsentTrialsPerBlock - 1;
-%         for ii = loopStart : loopEnd
-%             distractArray(ii) = jj;
-%         end
-%         loopStart = loopEnd + 1;
-%     end
-    
+   
 end
-
-blockPay = 0;
-sessionPay = 0;
-
-blockOmissionCounter = 0;
-blockOmissionReward = 0;
-
-% shuffled_distractArray = shuffleTrialorder(distractArray, exptPhase);   % Calls a function to shuffle trials
-
-trialCounter = 0;
-block = 1;
-trials_since_break = 0;
-DATA.fixationTimeouts = 0;
-DATA.trialTimeouts = 0;
 
 trialEGarray = zeros(timeoutDuration(exptPhase + 1) * 2 * 300, 27);    % Preallocate memory for eyetracking data. Tracker samples at 300Hz, so multiplying timeout duration by 2*300 means there will be plenty of slots
 
 Screen('Flip', main_window);     % Clear anything that's on the screen
 
-
 WaitSecs(initialPause);
 
 % ANDY - want to take the fixation out of the loop (just do it once)
-
-
-% for trial = 1 : numTrials  % trial loop
-    trialCounter = trialCounter + 1;    % This is used to set distractor type below; it can cycle independently of trial
-    trials_since_break = trials_since_break + 1;  
-
-%     targetLoc = randi(stimLocs);
-%     
-%     distractLoc = targetLoc;
-%     while distractLoc == targetLoc || abs(distractLoc - targetLoc) == 1 || abs(distractLoc - targetLoc) == 5
-%         distractLoc = randi(stimLocs);
-%     end
-    
-%     distractType = shuffled_distractArray(trialCounter);
-    
-    
-    postFixationPause = blankScreenAfterFixationPause(randi(3));
-    
+   
 %     Screen('FillRect', stimWindow, black);  % Clear the screen from the previous trial by drawing a black rectangle over the whole thing
     Screen('DrawTexture', stimWindow, fixationTex, [], fixRect);
     
@@ -199,7 +109,7 @@ WaitSecs(initialPause);
     
     Screen('Flip', main_window);     % Clear screen
     WaitSecs(briefPause);
-
+    
     
     Screen('DrawTexture', main_window, fixationAOIsprite, [], fixAOIrect);
     Screen('DrawTexture', main_window, fixationTex, [], fixRect);
@@ -214,6 +124,7 @@ WaitSecs(initialPause);
     gazeCycle = 0;
 
     startFixationTime = Screen('Flip', main_window, [], 1);     % Present fixation cross
+    
     
     [~, ~, ts, ~] = tetio_readGazeData; % Empty eye tracker buffer
     startEyePeriod = double(ts(end));  % Take the timestamp of the last element in the buffer as the start of the trial. Need to convert to double so can divide by 10^6 later to change to seconds

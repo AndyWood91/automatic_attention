@@ -247,8 +247,8 @@ if eyeVersion
 end
 
 % pressSpaceToBegin;
-% gaze_contingent_fixation(MainWindow);
-[~] = runTrials(0);     % ANDY - this now just shows the fixation cross
+gaze_contingent_fixation(MainWindow);
+% [~] = runTrials(0);     % ANDY - this now just shows the fixation cross
 
 % save(datafilename, 'DATA');
 

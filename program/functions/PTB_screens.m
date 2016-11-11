@@ -15,9 +15,8 @@ function [main_window, off_window, screen_dimensions] = PTB_screens(background, 
     if TESTING == 1
         Screen('Preference', 'SkipSyncTests', 2);      % Skips the Psychtoolbox calibrations - REMOVE THIS WHEN RUNNING FOR REAL!
         Screen('Preference', 'VisualDebuglevel', 3);    % Hides the hammertime PTB startup screen
-        PTB_screen = [0 0 screen_width*.75 screen_height*.75];  % three quarter screen
-%         PTB_screen = [0 0 screen_width screen_height];  % full screen
-
+        PTB_screen = [0 0 screen_width * 0.75 screen_height * 0.75];  % three quarter screen
+        screen_dimensions = screen_dimensions * 0.75;
     elseif TESTING == 0
         PTB_screen = [0 0 screen_width screen_height];  % full screen
     else

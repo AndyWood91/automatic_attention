@@ -1,11 +1,11 @@
 function  MainProc
 
-runET = 0;
+runET = 1;
 
 commandwindow;
 
 if runET == 1
-    GenericCalibration; runET = 1;
+    GenericCalibration;
 end
 
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',sum(100*clock)));
@@ -42,6 +42,12 @@ hand = input('Are you left of right handed? (R/L) ---> ','s');
 language = input('Is English your first language? (Y/N) ---> ','s');
 start_time = datestr(now,0);
 DATA.details = {age sex hand language start_time};
+
+if exist('DATA', 'dir') ~= 7  % check for the DATA directory
+    mkdir('DATA');  % make it if it doesn't exist
+end
+
+
 save(filePath,'DATA', '-v7.3'); % save DATA structure
 
 % KbName('UnifyKeyNames');  % Andy - in automatic_attention now
