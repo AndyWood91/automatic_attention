@@ -1,4 +1,4 @@
-function [RGB] = RGB_colours()
+function RGB = RGB_colours()
 % RGB_COLOURS:  Returns a Map container with keys for common colour names and
 % their RGB triplets as values
 

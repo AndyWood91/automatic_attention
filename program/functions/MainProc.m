@@ -45,24 +45,11 @@ timeoutLength = 3;
 fbTime = 2;
 ITI = .5; 
 
-%% Andy - in PTB_screens now
-ScreenRes = [1080 675];
-WinHeight = 675;
-WinWidth = 1080;
-MidH = WinWidth/2;
-MidV = WinHeight/2;
-winPos = zeros(1,4);
-winPos([1 3]) = [(ScreenRes(1)-WinWidth)/2  ScreenRes(1)-(ScreenRes(1)-WinWidth)/2];
-winPos([2 4]) = [ScreenRes(2)-WinHeight ScreenRes(2)];
-
 
 %% Andy - in create_gabors now
 % gabor properties
 create_gabors;
-[myGrating, ~] = CreateProceduralGabor(main_window, gabor_size, gabor_size, 0, [BGcol/255 0], [], 5);
-freq = .04; sc = 50; contrast = 20; aspectratio = 1.0;
-gabor_proportions = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
-GBpos = [50 MidV-gabor_size/2 50+gabor_size MidV+gabor_size/2; WinWidth-50-gabor_size MidV-gabor_size/2 WinWidth-50 MidV+gabor_size/2];
+[myGrating, ~] = CreateProceduralGabor(main_window, gabor_size, gabor_size, 0, [], [], 5);
 
 %%
 
@@ -80,9 +67,9 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         d = DATA.results(1:checkAccAt,8);
         mean(d==0)
         mean(d==9999)
-        DrawFormattedText(main_window, ['Your error rate so far is ', num2str(round(mean(d==0)*100)), ' %'], 'center', MidV-150);
-        DrawFormattedText(main_window, ['Your timeout % so far is ', num2str(round(mean(d==9999)*100)), ' %'], 'center', MidV-50);
-        DrawFormattedText(main_window, 'Please contact the experimenter', 'center', MidV+50);
+        DrawFormattedText(main_window, ['Your error rate so far is ', num2str(round(mean(d==0)*100)), ' %'], 'center', screen_dimensions(2, 2)-150);
+        DrawFormattedText(main_window, ['Your timeout % so far is ', num2str(round(mean(d==9999)*100)), ' %'], 'center', screen_dimensions(2, 2)-50);
+        DrawFormattedText(main_window, 'Please contact the experimenter', 'center', screen_dimensions(2, 2)+50);
         Screen('Flip', main_window);
         [~, ~] = accKbWait;
     end
@@ -132,11 +119,11 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         corResp = 39;
     end
     
-    RevInst = trialStructure(trial,6);
-    
-    if RevInst == 0
+    % ANDY - reversal instructions are now different colours for the
+    % fixation targets
+    if trialStructure(trial,6) == 0
         RevInst = RGB('yellow');  % normal trial
-    elseif RevInst == 1
+    elseif trialStructure(trial,6) == 1
         RevInst = RGB('green');  % reverse trial
     end
     
@@ -148,7 +135,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     % Draw gabors on screen
     for c = 1:2
         % I think this drawtexture command is drawing too small
-        Screen('DrawTexture', main_window, myGrating, [], GBpos(c,:), trialAngles(circleOrder(c)), [], [], gabor_colours(circleOrder(c),:), [], kPsychDontDoRotation, gabor_proportions);
+        Screen('DrawTexture', main_window, myGrating, [], gabor_position(c,:), trialAngles(circleOrder(c)), [], [], gabor_colours(circleOrder(c),:), [], kPsychDontDoRotation, gabor_proportions);
     end 
     tempTS(3) = Screen('Flip', main_window);
     
@@ -179,14 +166,15 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         RT = 9999;
     end
     
-    % F10 to quit program - you might take this out of final version
+    % Q to quit program - you might take this out of final version
     if choice == KbName('q');
         tetio_stopTracking;
         sca;
         error('user termination, exiting program');
     end
     
-    tempTS(4) = Screen('Flip', main_window); % flip blank screen on after response  
+    tempTS(4) = Screen('Flip', main_window); % flip blank screen on after response 
+    
     % error feedback
     if accuracy == 0
         Screen('DrawTexture', main_window, instructions_slides(8));

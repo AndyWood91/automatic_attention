@@ -1,11 +1,11 @@
 function [main_window, off_window, screen_dimensions] = PTB_screens(background, text, DATA, tracking)
 
-    if nargin <3
+    if nargin < 4
         tracking = false;  % default, no eye tracking
     end
     
     global TESTING
-    
+    tracking = false;
     % screen dimensions
     screen_number = 0;  % primary monitor
     [screen_width, screen_height] = Screen('WindowSize', screen_number);
