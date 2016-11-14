@@ -1,4 +1,4 @@
-function [fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow, main_window] = setupStimuli(main_window, fs, gpr)
+function [fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow, main_window] = setupStimuli(main_window, fs, gpr, fixation_colour)
 
 RGB = RGB_colours;
 
@@ -6,7 +6,7 @@ stim_size = 92;
 
 perfectDiam = stim_size + 10;   % Used in FillOval to increase drawing speed
 
-fixation_colour = RGB('green');
+% fixation_colour = RGB('green');
 
 % Create an offscreen window, and draw the fixation cross in it.
 fixationTex = Screen('OpenOffscreenWindow', 0, RGB('black'), [0 0 fs fs]);  % fs = fullscreen?

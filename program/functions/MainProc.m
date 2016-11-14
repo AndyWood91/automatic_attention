@@ -133,9 +133,12 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     end
     
     RevInst = trialStructure(trial,6);
-    % TODO: whatever is responsible for setting normal/reverse trials, need
-    % to extract it and use the colours of the fixation instead
-    % TODO: on inspection, looks like it's just a column in the cell array
+    
+    if RevInst == 0
+        RevInst = RGB('yellow');  % normal trial
+    elseif RevInst == 1
+        RevInst = RGB('green');  % reverse trial
+    end
     
     gaze_contingent_fixation(main_window, screen_dimensions, RevInst);
     % TODO: this is redrawing and remaking the textures on every trial,
