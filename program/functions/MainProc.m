@@ -2,12 +2,12 @@ function [] = MainProc(main_window, screen_dimensions, instructions_slides, DATA
 
 test_rectangle = [0 0 screen_dimensions(1, 1) screen_dimensions(1, 2)];
 
-runET = 0;
+runET = 1;
 
 commandwindow;
 
 if runET == 1
-    GenericCalibration; runET = 1;
+%     runPTBcalibration; runET = 1;  % ANDY - moved this to PTB screens
 end
 
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',sum(100*clock)));
@@ -65,9 +65,9 @@ gabor_proportions = [0 freq, sc, contrast, aspectratio, 0, 0, 0];
 GBpos = [50 MidV-gabor_size/2 50+gabor_size MidV+gabor_size/2; WinWidth-50-gabor_size MidV-gabor_size/2 WinWidth-50 MidV+gabor_size/2];
 
 %%
-if runET == 1
-    tetio_startTracking;
-end
+
+% tetio_startTracking;
+
 restCount = 0;
 
 HideCursor;
@@ -135,7 +135,8 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     
     % ANDY - Gaze contingent fixation goes here
 
-    fixation_textures;
+%     fixation_textures;
+    gaze_contingent_fixation(main_window, screen_dimensions);
     
    
     % Draw gabors on screen

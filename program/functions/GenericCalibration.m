@@ -1,8 +1,5 @@
 % Screen('Preference', 'SkipSyncTests', 1)
-
-% Input participant number in order to save calibration data
-
-p_number = input('Participant number  ---> ');
+% p_number = input('Participant number  ---> ');
 
 
 % Test Calibration Script

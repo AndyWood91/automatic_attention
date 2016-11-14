@@ -1,10 +1,9 @@
+function [] = TrackStatusPTB(Calib, main_window)
 % New TrackStatus Script
 
 %Use spacebar (or any other) key press to continue.
 %   Input:
 %         Calib: The calib config structure (see SetCalibParams)
-
-global MainWindow
 
 
 if (Calib.resize)
@@ -20,10 +19,10 @@ destTrackingBoxLoc = [figloc.x, figloc.y, figloc.x+figloc.width, figloc.y+figloc
 
 Calib.mondims = figloc;
 
-TrackingBox = Screen('OpenOffscreenWindow', MainWindow, Calib.bkcolor, destTrackingBoxLoc);
-GreenEye = Screen('OpenOffscreenWindow', MainWindow, Calib.bkcolor, [0 0 Calib.TrackStat Calib.TrackStat]);
+TrackingBox = Screen('OpenOffscreenWindow', main_window, Calib.bkcolor, destTrackingBoxLoc);
+GreenEye = Screen('OpenOffscreenWindow', main_window, Calib.bkcolor, [0 0 Calib.TrackStat Calib.TrackStat]);
 Screen('FillOval', GreenEye, [0 255 0], [], 25);
-YellowEye = Screen('OpenOffscreenWindow', MainWindow, Calib.bkcolor, [0 0 Calib.TrackStat, Calib.TrackStat]);
+YellowEye = Screen('OpenOffscreenWindow', main_window, Calib.bkcolor, [0 0 Calib.TrackStat, Calib.TrackStat]);
 Screen('FillOval', YellowEye, [255 255 0], [], 25);
 
 breakLoopFlag=0;
@@ -39,8 +38,9 @@ while(~breakLoopFlag)
     pause(1/updateFrequencyInHz);
     
     Screen('FillRect', TrackingBox, Calib.bkcolor);
+    Screen('FrameRect', TrackingBox, Calib.frameColor, [], 2);
     
-    RestrictKeysForKbCheck(32)
+    RestrictKeysForKbCheck(32);
     [keyIsDown,secs,keyCode]=KbCheck;
     if keyIsDown
         breakLoopFlag=1;
@@ -78,9 +78,15 @@ while(~breakLoopFlag)
         
         
     end
-    Screen('DrawTexture', MainWindow, TrackingBox, [], destTrackingBoxLoc);
-    Screen(MainWindow, 'Flip');
+    Screen('DrawTexture', main_window, TrackingBox, [], destTrackingBoxLoc);
+    Screen(main_window, 'Flip');
 end
 
+Screen(main_window, 'Flip');
+
+Screen('Close', TrackingBox);
+Screen('Close', GreenEye);
+Screen('Close', YellowEye);
 
 tetio_stopTracking;
+end

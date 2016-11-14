@@ -80,8 +80,8 @@ if eyeVersion
 end
 
 
-if ~exist('CalibrationDat', 'dir')
-    mkdir('CalibrationDat');
+if ~exist('CalibrationData', 'dir')
+    mkdir('CalibrationData');
 end
 if ~exist('EyeData', 'dir')
     mkdir('EyeData');
@@ -239,7 +239,7 @@ for ii = 1 : length(colourName)
     end
 end
 
-
+commandwindow;
 % initialInstructions;
 
 if eyeVersion
@@ -247,6 +247,7 @@ if eyeVersion
 end
 
 % pressSpaceToBegin;
+
 gaze_contingent_fixation(MainWindow);
 % [~] = runTrials(0);     % ANDY - this now just shows the fixation cross
 

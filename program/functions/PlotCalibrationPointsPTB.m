@@ -1,10 +1,9 @@
-function [pts, keyPressed] = PlotCalibrationPointsPTB(calibPlot, Calib, mOrder)
+function [pts, keyPressed] = PlotCalibrationPointsPTB(calibPlot, Calib, mOrder, main_window)
 
-global MainWindow
 
 NumCalibPoints = length(calibPlot)/8;
-clear OrignalPoints
-clear pts
+clear OrignalPoints;
+clear pts;
 j = 1;
 for i = 1:NumCalibPoints
     OrignalPoints(i,:) = [calibPlot(j) calibPlot(j+1)];
@@ -42,21 +41,23 @@ end
 
 Calib.mondims = figloc;
 
-calibPlotWin = Screen('OpenOffscreenWindow', MainWindow, Calib.bkcolor, [figloc.x, figloc.y, figloc.x+figloc.width, figloc.y+figloc.height]);
+calibPlotWin = Screen('OpenOffscreenWindow', main_window, Calib.bkcolor, [figloc.x, figloc.y, figloc.x+figloc.width, figloc.y+figloc.height]);
+Screen('FrameRect', calibPlotWin, Calib.frameColor, [], 2);
+
 Screen('BlendFunction', calibPlotWin, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); %This allows for transparent background on white dot
 %Draw small blue circle
 SmallMarkerRect = [0 0 Calib.SmallMark Calib.SmallMark];
 SmallMarkerCentre = Calib.SmallMark/2;
-SmallMarker = Screen('OpenOffscreenWindow', MainWindow, [0 0 0 0], SmallMarkerRect); %alpha value of zero to allow transparency when drawing dots on top of each other
+SmallMarker = Screen('OpenOffscreenWindow', main_window, [0 0 0 0], SmallMarkerRect); %alpha value of zero to allow transparency when drawing dots on top of each other
 Screen('FillOval', SmallMarker, [0 0 255 255], [], Calib.SmallMark);
 Screen('FrameOval', SmallMarker, [0 0 0 255],[],  1);
 
 %Draw Eye markers
 EyeMarkerRect = [0 0 Calib.SmallMark Calib.SmallMark];
 EyeMarkerCentre = Calib.SmallMark/2;
-GreenMarker = Screen('OpenOffscreenWindow', MainWindow, [0 0 0 0], EyeMarkerRect); %alpha value of zero to allow transparency when drawing dots on top of each other
+GreenMarker = Screen('OpenOffscreenWindow', main_window, [0 0 0 0], EyeMarkerRect); %alpha value of zero to allow transparency when drawing dots on top of each other
 Screen('FrameOval', GreenMarker, [0 255 0 255], [], 1);
-RedMarker = Screen('OpenOffscreenWindow', MainWindow, [0 0 0 0], EyeMarkerRect); %alpha value of zero to allow transparency when drawing dots on top of each other
+RedMarker = Screen('OpenOffscreenWindow', main_window, [0 0 0 0], EyeMarkerRect); %alpha value of zero to allow transparency when drawing dots on top of each other
 Screen('FrameOval', RedMarker, [255 0 0 255], [], 1);
 
 for i = 1:length(lp)
@@ -74,20 +75,28 @@ for i = 1:length(lp)
     end
 end
 
-Screen('DrawTexture', MainWindow, calibPlotWin);
-Screen('TextSize', MainWindow, 36);
-Screen('TextFont', MainWindow, 'Calibri');
-Screen('TextStyle', MainWindow, 1);
+Screen('DrawTexture', main_window, calibPlotWin);
+Screen('TextSize', main_window, 36);
+Screen('TextFont', main_window, 'Calibri');
+Screen('TextStyle', main_window, 1);
 
-DrawFormattedText(MainWindow, 'Accept Calibration? [y]/n?', 'center', figloc.y+figloc.height+150, [255 255 255], 120, [], [], 1.5);
-Screen(MainWindow, 'Flip');
+DrawFormattedText(main_window, 'Accept Calibration? [y]/n?', 'center', figloc.y+figloc.height+150, [255 255 255], 120, [], [], 1.5);
+Screen(main_window, 'Flip');
 
-WaitSecs(2);
+WaitSecs(0.5);
 
 
 RestrictKeysForKbCheck([89, 78]);
 KbWait([],2);
 [~, ~, keyCode] = KbCheck;      % This stores which key is pressed as a keyCode
 keyPressed = KbName(keyCode);
+
+Screen(main_window, 'Flip');
+
+Screen('Close', calibPlotWin);
+Screen('Close', SmallMarker);
+Screen('Close', GreenMarker);
+Screen('Close', RedMarker);
+
 end
         

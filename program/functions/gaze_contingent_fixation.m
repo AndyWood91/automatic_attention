@@ -53,7 +53,7 @@ fixRect = [screen_dimensions(2, 1) - fix_size/2    screen_dimensions(2, 2) - fix
 fixAOIrect = [screen_dimensions(2, 1) - fix_aoi_radius    screen_dimensions(2, 2) - fix_aoi_radius   screen_dimensions(2, 1) + fix_aoi_radius   screen_dimensions(2, 2) + fix_aoi_radius];
 
 
-[diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(fix_size, gazePointRadius);
+[fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(main_window, fix_size, gazePointRadius);
 
 trialEGarray = zeros(timeoutDuration(exptPhase + 1) * 2 * 300, 27);    % Preallocate memory for eyetracking data. Tracker samples at 300Hz, so multiplying timeout duration by 2*300 means there will be plenty of slots
 
@@ -112,7 +112,7 @@ WaitSecs(initialPause);
         if isempty(ts) == 0
             
             
-            [eyeX, eyeY, validPoints] = findMeanGazeLocation(lefteye, righteye, length(ts));    % Find mean gaze location during the previous polling interval
+            [eyeX, eyeY, validPoints] = findMeanGazeLocation(lefteye, righteye, length(ts), screen_dimensions);    % Find mean gaze location during the previous polling interval
             
             gazeCycle = gazeCycle + 1;
             
@@ -125,7 +125,7 @@ WaitSecs(initialPause);
                     Screen('DrawTexture', main_window, gazePointSprite, [], [currentGazePoint(1) - gazePointRadius, currentGazePoint(2) - gazePointRadius, currentGazePoint(1) + gazePointRadius, currentGazePoint(2) + gazePointRadius]);
                     Screen('DrawingFinished', main_window);
                     
-                    stimSelected = checkEyesOnFixation(eyeX, eyeY);     % If some gaze has been detected, check whether this is on the fixation cross, or "everywhere else"
+                    stimSelected = checkEyesOnFixation(eyeX, eyeY, screen_dimensions);     % If some gaze has been detected, check whether this is on the fixation cross, or "everywhere else"
                     
                 end
                 
@@ -361,13 +361,12 @@ WaitSecs(initialPause);
     % carry on with the experiment
     if sum(keyCode) > 0
         take_a_break(breakDuration, initialPause, 1, sessionPay, 1);
-        [diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(fix_size, gazePointRadius);
+        [fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(main_window, fix_size, gazePointRadius);
     end
    
     
     
  
-Screen('Close', diamondTex);
 Screen('Close', fixationTex);
 Screen('Close', colouredFixationTex);
 Screen('Close', fixationAOIsprite);
@@ -378,8 +377,7 @@ Screen('Close', stimWindow);
 
 end
 
-function [eyeXpos, eyeYpos, sum_validities] = findMeanGazeLocation(lefteyeData, righteyeData, samples)
-global screenRes
+function [eyeXpos, eyeYpos, sum_validities] = findMeanGazeLocation(lefteyeData, righteyeData, samples, screen_dimensions)
 
 lefteyeValidity = zeros(samples,1);
 righteyeValidity = zeros(samples,1);
@@ -398,14 +396,14 @@ end
 
 sum_validities = sum(lefteyeValidity) + sum(righteyeValidity);
 if sum_validities > 0
-    eyeXpos = screenRes(1) * (lefteyeData(:,7)' * lefteyeValidity + righteyeData(:,7)' * righteyeValidity) / sum_validities;
-    eyeYpos = screenRes(2) * (lefteyeData(:,8)' * lefteyeValidity + righteyeData(:,8)' * righteyeValidity) / sum_validities;
+    eyeXpos = screen_dimensions(1, 1) * (lefteyeData(:,7)' * lefteyeValidity + righteyeData(:,7)' * righteyeValidity) / sum_validities;
+    eyeYpos = screen_dimensions(1, 2) * (lefteyeData(:,8)' * lefteyeValidity + righteyeData(:,8)' * righteyeValidity) / sum_validities;
 
-    if eyeXpos > screenRes(1)       % This guards against the possible bug that Tom identified where gaze can be registered off-screen
-        eyeXpos = screenRes(1);
+    if eyeXpos > screen_dimensions(1, 1)       % This guards against the possible bug that Tom identified where gaze can be registered off-screen
+        eyeXpos = screen_dimensions(1, 1);
     end
-    if eyeYpos > screenRes(2)
-        eyeYpos = screenRes(2);
+    if eyeYpos > screen_dimensions(1, 2)
+        eyeYpos = screen_dimensions(1, 2);
     end
 
 else
@@ -432,8 +430,8 @@ end
 end
 
 
-function detected = checkEyesOnFixation(x, y)
-global scr_centre fix_aoi_radius
+function detected = checkEyesOnFixation(x, y, screen_dimensions)
+global fix_aoi_radius
 
 detected = 2;
 if (x - screen_dimensions(2, 1))^2 + (y - screen_dimensions(2, 2))^2 <= fix_aoi_radius^2
@@ -442,6 +440,3 @@ if (x - screen_dimensions(2, 1))^2 + (y - screen_dimensions(2, 2))^2 <= fix_aoi_
 end
 
 end
-
-
-

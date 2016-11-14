@@ -5,12 +5,12 @@ KbName('UnifyKeyNames');
 addpath('functions');
 
 global TESTING
-TESTING = 1;
+TESTING = 0;
 
 % generic functions
 DATA = get_details('automatic_attention', {}, 1, true);
 RGB = RGB_colours();
-[main_window, off_window, screen_dimensions] = PTB_screens(RGB('black'), RGB('white'));  % setup PTB screens
+[main_window, off_window, screen_dimensions] = PTB_screens(RGB('black'), RGB('white'), DATA, true);  % setup PTB screens
 
 % fixation_textures;
 
