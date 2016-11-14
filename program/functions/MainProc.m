@@ -136,7 +136,11 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     for c = 1:2
         % I think this drawtexture command is drawing too small
         Screen('DrawTexture', main_window, myGrating, [], gabor_position(c,:), trialAngles(circleOrder(c)), [], [], gabor_colours(circleOrder(c),:), [], kPsychDontDoRotation, gabor_proportions);
-    end 
+    end
+    
+    % draw gabor in middle of screen (for training phase!)
+%     tempTS(3) = Screen('DrawTexture', main_window, myGrating, [], gabor_position(3,:), trialAngles(circleOrder(1)), [], [], gabor_colours(circleOrder(1),:), [], kPsychDontDoRotation, gabor_proportions);
+
     tempTS(3) = Screen('Flip', main_window);
     
 %     % screenshot
