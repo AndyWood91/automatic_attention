@@ -1,9 +1,8 @@
 function [] = gaze_contingent_fixation(main_window, screen_dimensions, fixation_colour)
+% ANDY - this is using offscreen windows so it's a bit dated.
+
 % GAZE_CONTINGENT_FIXATION: 
 
-RGB = RGB_colours;
-black = RGB('black');
-% ugly fix
 
 exptPhase = 0;
 gamma = 0.2;  % Controls smoothing of displayed gaze location. Lower values give more smoothing
@@ -11,10 +10,10 @@ gamma = 0.2;  % Controls smoothing of displayed gaze location. Lower values give
 timeoutDuration = [4, 2];     % [4, 2] timeout duration
 fixationTimeoutDuration = 5;    % 5 fixation timeout duration
 
-itiDuration = 1.2;            % 1.2
+itiDuration = 0;            % 1.2
 briefPause = 0.1;       % 0.1
 yellowFixationDuration = 0.3;     % Duration for which fixation cross turns yellow to indicate trial about to start
-initialPause = 2.5;   % 2.5 ***
+initialPause = 0;   % 2.5 ***
 breakDuration = 20;  % 20 ***
 fixationFixationTime = 0.7;       % Time that fixation cross must be fixated for trial to begin
 fixationPollingInterval = 0.03;    % Duration between successive polls of the eyetracker for gaze contingent stuff; during fixation display
@@ -37,10 +36,48 @@ fixRect = [screen_dimensions(2, 1) - fix_size/2    screen_dimensions(2, 2) - fix
 fixAOIrect = [screen_dimensions(2, 1) - fix_aoi_radius    screen_dimensions(2, 2) - fix_aoi_radius   screen_dimensions(2, 1) + fix_aoi_radius   screen_dimensions(2, 2) + fix_aoi_radius];
 
 
-[fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow, main_window] = setupStimuli(main_window, fix_size, gazePointRadius, fixation_colour);
+% [fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow, main_window] = setupStimuli(main_window, fix_size, gazePointRadius, fixation_colour);
+% ANDY - going to try and take this out of a function, textures should
+% probably be made with the PTB_screens
+%%
+RGB = RGB_colours;
 
+stim_size = 92;
+fs = fix_size; 
+gpr = gazePointRadius;
+
+perfectDiam = stim_size + 10;   % Used in FillOval to increase drawing speed
+
+% fixation_colour = RGB('green');
+
+% Create an offscreen window, and draw the fixation cross in it.
+fixationTex = Screen('OpenOffscreenWindow', 0, RGB('black'), [0 0 fs fs]);  % fs = fullscreen?
+Screen('DrawLine', fixationTex, RGB('white'), 0, fs/2, fs, fs/2, 2);
+Screen('DrawLine', fixationTex, RGB('white'), fs/2, 0, fs/2, fs, 2);
+
+
+colouredFixationTex = Screen('OpenOffscreenWindow', 0, RGB('black'), [0 0 fs fs]);
+Screen('DrawLine', colouredFixationTex, fixation_colour, 0, fs/2, fs, fs/2, 4);
+Screen('DrawLine', colouredFixationTex, fixation_colour, fs/2, 0, fs/2, fs, 4);
+
+% Create a sprite for the circular AOI around the fixation cross
+fixationAOIsprite = Screen('OpenOffscreenWindow', 0, RGB('black'), [0 0  120  120]);
+Screen('FrameOval', fixationAOIsprite, RGB('white'), [], 1, 1);   % Draw fixation aoi circle
+
+colouredFixationAOIsprite = Screen('OpenOffscreenWindow', 0, RGB('black'), [0 0  120  120]);
+Screen('FrameOval', colouredFixationAOIsprite, fixation_colour, [], 2, 2);   % Draw fixation aoi circle
+
+
+% Create a marker for eye gaze
+gazePointSprite = Screen('OpenOffscreenWindow', 0, [0 0 0 0], [0 0 gpr*2 gpr*2]);
+Screen('FillOval', gazePointSprite, [fixation_colour 255], [0 0 gpr*2 gpr*2], perfectDiam);       % Draw stimulus circles
+
+% Create a full-size offscreen window that will be used for drawing all
+% stimuli and targets (and fixation cross) into
+stimWindow = Screen('OpenOffscreenWindow', 0, RGB('black'));
+%%
 trialEGarray = zeros(timeoutDuration(exptPhase + 1) * 2 * 300, 27);    % Preallocate memory for eyetracking data. Tracker samples at 300Hz, so multiplying timeout duration by 2*300 means there will be plenty of slots
-% ANDY - still need this
+% ANDY - still need this, but it's currently wron.
 
 Screen('Flip', main_window);     % Clear anything that's on the screen
 
@@ -48,8 +85,8 @@ WaitSecs(initialPause);
 
 % ANDY - want to take the fixation out of the loop (just do it once)
 
-   
-Screen('FillRect', stimWindow, black);  % Clear the screen from the previous trial by drawing a black rectangle over the whole thing
+% Andy - should be able to flip the screen   
+Screen('FillRect', stimWindow, RGB('black'));  % Clear the screen from the previous trial by drawing a black rectangle over the whole thing
 Screen('DrawTexture', stimWindow, fixationTex, [], fixRect);
 
 

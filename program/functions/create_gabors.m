@@ -2,6 +2,8 @@ gabor_size = 400;  % in pixels
 [gabor_ID, ~] = CreateProceduralGabor(main_window, gabor_size, gabor_size);  % dunno
 gabor_angles1 = [95 265 95 265 90 270 90 270];  % angled & flat
 gabor_angles2 = [95 265 95 265 95 265 95 265];  % both angled
+% gonna change this
+% gabor_angles = [95 265 95 265; 
 colours = [RGB('blue'); RGB('grey'); RGB('red'); RGB('green')];  % none of these actually come through
 colours = colours(randperm(4),:); % randomise order of colours
 gabor_colours = [colours(1,:); colours(1,:); colours(2,:); colours(2,:); ...
