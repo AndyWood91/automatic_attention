@@ -3,7 +3,7 @@ function finalTS = makeTrialStructure
 % this array describes the structure/proportion of basic and reverse across the stages
 % of the experiment. By using 8 to 2 ratio, we control where the reversal
 % trials pop up. They occur 8 times in every 40.
-stg2 = repmat([5 5],2,1); % rather than type 8 2 lots of times!
+stg2 = repmat([8 2],2,1); % rather than type 8 2 lots of times!
 BlockStruc = [40 0; stg2];
 
 standardTS = zeros(8,5);
