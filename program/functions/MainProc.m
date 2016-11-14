@@ -66,7 +66,7 @@ GBpos = [50 MidV-gabor_size/2 50+gabor_size MidV+gabor_size/2; WinWidth-50-gabor
 
 %%
 
-% tetio_startTracking;
+tetio_startTracking;
 
 restCount = 0;
 
@@ -103,14 +103,14 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
             end
             Screen('DrawTexture', main_window, instructions_slides(i), [], test_rectangle);
             Screen('Flip', main_window);
-            [bin, ~, ~] = accKbWait;
+            [~, ~, ~] = accKbWait;
         end
         trialAngles = gabor_angles1; % intial gabor angles for Stage 1
     elseif trial == stage2instAT % Stage 2 instructions
         RestrictKeysForKbCheck(KbName('p'));            
         Screen('DrawTexture', main_window, instructions_slides(5), [], test_rectangle);
         Screen('Flip', main_window);
-        [bin, ~, ~] = accKbWait;
+        [~, ~, ~] = accKbWait;
         trialAngles = gabor_angles2; % new gabor angles for Stage 2
     elseif trial == stage3instAT % Stage 3 instructions
         for i = 6:7
@@ -119,7 +119,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
             end
             Screen('DrawTexture', main_window, instructions_slides(i), [], test_rectangle);
             Screen('Flip', main_window);
-            [bin, ~, ~] = accKbWait;
+            [~, ~, ~] = accKbWait;
         end
     end
     RestrictKeysForKbCheck([KbName('LeftArrow') KbName('RightArrow') KbName('q')]);
@@ -127,20 +127,24 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     % read in the trial events
     circleOrder = [trialStructure(trial,2) trialStructure(trial,3)];
     if trialStructure(trial,4) == 1;
-        corResp = 79;
+        corResp = 37;
     else
-        corResp = 80;
+        corResp = 39;
     end
-    RevInst = trialStructure(trial,6);
     
-    % ANDY - Gaze contingent fixation goes here
-
-%     fixation_textures;
-    gaze_contingent_fixation(main_window, screen_dimensions);
+    RevInst = trialStructure(trial,6);
+    % TODO: whatever is responsible for setting normal/reverse trials, need
+    % to extract it and use the colours of the fixation instead
+    % TODO: on inspection, looks like it's just a column in the cell array
+    
+    gaze_contingent_fixation(main_window, screen_dimensions, RevInst);
+    % TODO: this is redrawing and remaking the textures on every trial,
+    % need to refactor it.
     
    
     % Draw gabors on screen
     for c = 1:2
+        % I think this drawtexture command is drawing too small
         Screen('DrawTexture', main_window, myGrating, [], GBpos(c,:), trialAngles(circleOrder(c)), [], [], gabor_colours(circleOrder(c),:), [], kPsychDontDoRotation, gabor_proportions);
     end 
     tempTS(3) = Screen('Flip', main_window);
@@ -173,10 +177,10 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     end
     
     % F10 to quit program - you might take this out of final version
-    if choice == 20
+    if choice == KbName('q');
+        tetio_stopTracking;
         sca;
         error('user termination, exiting program');
-        break
     end
     
     tempTS(4) = Screen('Flip', main_window); % flip blank screen on after response  
@@ -208,6 +212,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     save(DATA.experiment.filename,'DATA'); % save results to disk
     
 end
+
 if runET == 1
     DATA.fixEG = fixEG; DATA.instEG = instEG; DATA.stimEG = stimEG;
     tetio_stopTracking;
