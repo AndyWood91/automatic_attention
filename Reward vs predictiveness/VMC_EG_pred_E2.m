@@ -35,7 +35,7 @@ commandwindow;
 
 exptName = 'VMC_EG_pred_E2';
 
-eyeVersion = true;
+eyeVersion = false;
 realVersion = false;
 
 screenNum = 0;

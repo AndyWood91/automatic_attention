@@ -52,8 +52,76 @@ fixRect = [screen_dimensions(2, 1) - fix_size/2    screen_dimensions(2, 2) - fix
 % Create a rect for the circular fixation AOI
 fixAOIrect = [screen_dimensions(2, 1) - fix_aoi_radius    screen_dimensions(2, 2) - fix_aoi_radius   screen_dimensions(2, 1) + fix_aoi_radius   screen_dimensions(2, 2) + fix_aoi_radius];
 
-
+%%
 [diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(fix_size, gazePointRadius);
+<<<<<<< Updated upstream
+=======
+%%
+
+% Create a matrix containing the six stimulus locations, equally spaced
+% around an imaginary circle of diameter circ_diam
+stimRect = zeros(stimLocs,4);
+
+for i = 0 : stimLocs - 1    % Define rects for stimuli and line segments
+    stimRect(i+1,:) = [scr_centre(1) - circ_diam * sin(i*2*pi/stimLocs) - stim_size / 2   scr_centre(2) - circ_diam * cos(i*2*pi/stimLocs) - stim_size / 2   scr_centre(1) - circ_diam * sin(i*2*pi/stimLocs) + stim_size / 2   scr_centre(2) - circ_diam * cos(i*2*pi/stimLocs) + stim_size / 2];
+end
+
+stimCentre = zeros(stimLocs, 2);
+for i = 1 : stimLocs
+    stimCentre(i,:) = [stimRect(i,1) + stim_size / 2,  stimRect(i,2) + stim_size / 2];
+end
+distractorAOIradius = 2 * (circ_diam / 2) * sin(pi / stimLocs);       % This gives circular AOIs that are tangent to each other
+targetAOIradius = round(stim_size * 0.75);        % This gives a smaller AOI that will be used to determine target fixations on each trial
+
+aoiRadius = zeros(stimLocs);
+
+
+if exptPhase == 0
+    numTrials = pracTrials;
+    
+    distractArray = zeros(1, pracTrials);
+    distractArray(1 : pracTrials) = 7;
+    
+else
+    numTrials = exptTrials;
+    
+%     distractArray = zeros(1,exptTrialsPerBlock);
+%     
+%     loopStart = 1;
+%     
+%     for jj = 1 : numDistractType      % Predictive and nonpredictive cue
+%         loopEnd = loopStart + numDistractTrialsPerBlock - 1;
+%         for ii = loopStart : loopEnd
+%             distractArray(ii) = jj;
+%         end
+%         loopStart = loopEnd + 1;
+%     end
+%     
+%     
+%     for jj = numDistractType + 1 : numDistractType + numAbsentType      % Distractor absent trials
+%         loopEnd = loopStart + numAbsentTrialsPerBlock - 1;
+%         for ii = loopStart : loopEnd
+%             distractArray(ii) = jj;
+%         end
+%         loopStart = loopEnd + 1;
+%     end
+    
+end
+
+blockPay = 0;
+sessionPay = 0;
+
+blockOmissionCounter = 0;
+blockOmissionReward = 0;
+
+% shuffled_distractArray = shuffleTrialorder(distractArray, exptPhase);   % Calls a function to shuffle trials
+
+trialCounter = 0;
+block = 1;
+trials_since_break = 0;
+DATA.fixationTimeouts = 0;
+DATA.trialTimeouts = 0;
+>>>>>>> Stashed changes
 
 trialEGarray = zeros(timeoutDuration(exptPhase + 1) * 2 * 300, 27);    % Preallocate memory for eyetracking data. Tracker samples at 300Hz, so multiplying timeout duration by 2*300 means there will be plenty of slots
 

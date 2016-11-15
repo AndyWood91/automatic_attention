@@ -1,9 +1,12 @@
 function [diamondTex, fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow] = setupStimuli(fs, gpr)
 
 global MainWindow
-global fix_aoi_radius
-global white black gray yellow
-global stim_size
+
+RGB = RGB_colours();
+
+stim_size = 92;
+fix_aoi_radius = 60;
+
 
 perfectDiam = stim_size + 10;   % Used in FillOval to increase drawing speed
 
@@ -15,24 +18,24 @@ d_pts = [stim_size/2, 0;
 
 
 % Create an offscreen window, and draw the two diamonds onto it to create a diamond-shaped frame.
-diamondTex = Screen('OpenOffscreenWindow', MainWindow, black, [0 0 stim_size stim_size]);
-Screen('FillPoly', diamondTex, gray, d_pts);
+diamondTex = Screen('OpenOffscreenWindow', MainWindow, RGB('black'), [0 0 stim_size stim_size]);
+Screen('FillPoly', diamondTex, RGB('grey'), d_pts);
 
 % Create an offscreen window, and draw the fixation cross in it.
-fixationTex = Screen('OpenOffscreenWindow', MainWindow, black, [0 0 fs fs]);  % fs = fullscreen?
-Screen('DrawLine', fixationTex, white, 0, fs/2, fs, fs/2, 2);
-Screen('DrawLine', fixationTex, white, fs/2, 0, fs/2, fs, 2);
+fixationTex = Screen('OpenOffscreenWindow', MainWindow, RGB('black'), [0 0 fs fs]);  % fs = fullscreen?
+Screen('DrawLine', fixationTex, RGB('white'), 0, fs/2, fs, fs/2, 2);
+Screen('DrawLine', fixationTex, RGB('white'), fs/2, 0, fs/2, fs, 2);
 
 
-colouredFixationTex = Screen('OpenOffscreenWindow', MainWindow, black, [0 0 fs fs]);
+colouredFixationTex = Screen('OpenOffscreenWindow', MainWindow, RGB('black'), [0 0 fs fs]);
 Screen('DrawLine', colouredFixationTex, yellow, 0, fs/2, fs, fs/2, 4);
 Screen('DrawLine', colouredFixationTex, yellow, fs/2, 0, fs/2, fs, 4);
 
 % Create a sprite for the circular AOI around the fixation cross
-fixationAOIsprite = Screen('OpenOffscreenWindow', MainWindow, black, [0 0  fix_aoi_radius*2  fix_aoi_radius*2]);
-Screen('FrameOval', fixationAOIsprite, white, [], 1, 1);   % Draw fixation aoi circle
+fixationAOIsprite = Screen('OpenOffscreenWindow', MainWindow, RGB('black'), [0 0  fix_aoi_radius*2  fix_aoi_radius*2]);
+Screen('FrameOval', fixationAOIsprite, RGB('white'), [], 1, 1);   % Draw fixation aoi circle
 
-colouredFixationAOIsprite = Screen('OpenOffscreenWindow', MainWindow, black, [0 0  fix_aoi_radius*2  fix_aoi_radius*2]);
+colouredFixationAOIsprite = Screen('OpenOffscreenWindow', MainWindow, RGB('black'), [0 0  fix_aoi_radius*2  fix_aoi_radius*2]);
 Screen('FrameOval', colouredFixationAOIsprite, yellow, [], 2, 2);   % Draw fixation aoi circle
 
 
@@ -42,5 +45,5 @@ Screen('FillOval', gazePointSprite, [yellow 255], [0 0 gpr*2 gpr*2], perfectDiam
 
 % Create a full-size offscreen window that will be used for drawing all
 % stimuli and targets (and fixation cross) into
-stimWindow = Screen('OpenOffscreenWindow', MainWindow, black);
+stimWindow = Screen('OpenOffscreenWindow', MainWindow, RGB('black'));
 end
