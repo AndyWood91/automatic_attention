@@ -11,10 +11,10 @@ gamma = 0.2;  % Controls smoothing of displayed gaze location. Lower values give
 timeoutDuration = [4, 2];     % [4, 2] timeout duration
 fixationTimeoutDuration = 5;    % 5 fixation timeout duration
 
-itiDuration = 1.2;            % 1.2
+itiDuration = 0;            % 1.2
 briefPause = 0.1;       % 0.1
-yellowFixationDuration = 0.3;     % Duration for which fixation cross turns yellow to indicate trial about to start
-initialPause = 2.5;   % 2.5 ***
+yellowFixationDuration = 1;     % Duration for which fixation cross turns yellow to indicate trial about to start
+initialPause = 0;   % 2.5 ***
 breakDuration = 20;  % 20 ***
 fixationFixationTime = 0.7;       % Time that fixation cross must be fixated for trial to begin
 fixationPollingInterval = 0.03;    % Duration between successive polls of the eyetracker for gaze contingent stuff; during fixation display
@@ -131,6 +131,9 @@ if tracking == true
     end
     
 elseif tracking == false
+    Screen('DrawTexture', main_window, fixationAOIsprite, [], fixAOIrect);   % Redraw fixation cross and AOI, and draw gaze point on top of that
+    Screen('DrawTexture', main_window, fixationTex, [], fixRect);
+    Screen('Flip', main_window);
     WaitSecs(2);
 end
 

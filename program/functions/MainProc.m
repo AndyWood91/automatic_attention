@@ -86,7 +86,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     restCount = restCount + 1;
     
 %     % SETTING INSTRUCTIONS
-    RestrictKeysForKbCheck(KbName('space')); % space bar, this isn't working
+    RestrictKeysForKbCheck(KbName('space')); 
     if trial == 1 % put up inst 1
         for i = 1:4
             if i == 4
@@ -97,6 +97,8 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
             [~, ~, ~] = accKbWait;
         end
         trialAngles = gabor_angles1; % intial gabor angles for Stage 1
+        % ANDY - changing this to play with the one_gabor screens
+%         trialAngles = gabor_angles2;
     elseif trial == stage2instAT % Stage 2 instructions
         RestrictKeysForKbCheck(KbName('p'));            
         Screen('DrawTexture', main_window, instructions_slides(5), [], test_rectangle);
@@ -113,14 +115,25 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
             [~, ~, ~] = accKbWait;
         end
     end
-    RestrictKeysForKbCheck([KbName('LeftArrow') KbName('RightArrow') KbName('q')]);
+    % this is different between Mac and Windows and it's dumb.
+    RestrictKeysForKbCheck([KbName('LeftArrow') KbName('RightArrow') KbName('q'), KbName('c')]);
     
     % read in the trial events
+    trialStructure;
+    
     circleOrder = [trialStructure(trial,2) trialStructure(trial,3)];
-    if trialStructure(trial,4) == 1;
-        corResp = 37;
+    if trialStructure(trial, 2) == 1 || trialStructure(trial, 2) == 2 ...
+            || trialStructure(trial, 2) == 3 || trialStructure(trial, 2) == 4
+        target_gabor = 1;  % left
     else
-        corResp = 39;
+        target_gabor = 2;  % right
+    end
+    if trialStructure(trial,4) == 1;
+        corResp = KbName('LeftArrow');
+    elseif trialStructure(trial, 4) == 2;
+        corResp = KbName('RightArrow');
+    else
+        error('something broke in trial structure');
     end
     
     % ANDY - reversal instructions are now different colours for the
@@ -137,13 +150,32 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     
    
     % Draw gabors on screen
-    for c = 1:2
-        % I think this drawtexture command is drawing too small
-        Screen('DrawTexture', main_window, myGrating, [], gabor_position(c,:), trialAngles(circleOrder(c)), [], [], gabor_colours(circleOrder(c),:), [], kPsychDontDoRotation, gabor_proportions);
-    end
+    % which one is the correct one?
+    % draws two gabors, so need to check first I think
+    
+    
+        % 1 will be on the left, 2 on the right
+    %
+    Screen('DrawTexture', main_window, myGrating, [], gabor_position(target_gabor,:), ...
+        trialAngles(circleOrder(target_gabor)), [], [], ...
+        gabor_colours(circleOrder(target_gabor), :), [], kPsychDontDoRotation, ...
+        gabor_proportions);
+        
+        % 1
+        % Screen('DrawTexture', main_window, myGrating, [],
+        % gabor_position(1, :), trialAngles(circleOrder(1)), [], [], 
+        % gabor_colours(circleOrder(1), :), [], kPsychDontDoRotation,
+        % gabor_proportions);
+        
+        % 2
+        % Screen('DrawTexture', main_window, myGrating, [],
+        % gabor_position(2, :), trialAngles(circleOrder(2)), [], [],
+        % gabor_colours(circleOrder(2), :), [], kPsychDontDoRotation,
+        % gabor_proportions);
     
     % draw gabor in middle of screen (for training phase!)
-%     tempTS(3) = Screen('DrawTexture', main_window, myGrating, [], gabor_position(3,:), trialAngles(circleOrder(1)), [], [], gabor_colours(circleOrder(1),:), [], kPsychDontDoRotation, gabor_proportions);
+    % work out which one is the angled one
+%     Screen('DrawTexture', main_window, myGrating, [], gabor_position(1,:), trialAngles(circleOrder(1)), [], [], gabor_colours(circleOrder(1),:), [], kPsychDontDoRotation, gabor_proportions);
 
     tempTS(3) = Screen('Flip', main_window);
     
@@ -152,7 +184,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
 %     imwrite(imageArray,'ss1','jpg')
     
     % wait for and record response
-    RestrictKeysForKbCheck([KbName('LeftArrow') KbName('RightArrow') KbName('q')]);
+    RestrictKeysForKbCheck([KbName('LeftArrow') KbName('RightArrow') KbName('q'), KbName('c')]);
     [keyCode, keyDown, timeout] = accKbWait(tempTS(3), timeoutLength); % Accurate measure response time, stored as keyDown. If timeout is used specify start time (1) and duration (2).
     RT = 1000 * (keyDown - tempTS(3)); % Response time in ms
     choice = find(keyCode==1);
@@ -181,6 +213,14 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         end
         sca;
         error('user termination, exiting program');
+    end
+    
+    % c to recalibrate eye tracker
+    if tracking == true
+        if choice == KbName('c');
+            % TODO: run recalibration - going to have to fix gaze contingent
+            % windows first though
+        end
     end
     
     tempTS(4) = Screen('Flip', main_window); % flip blank screen on after response 
