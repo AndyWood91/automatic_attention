@@ -1,4 +1,4 @@
-function [] = gaze_contingent_fixation(main_window, screen_dimensions, fixation_colour)
+function [] = gaze_contingent_fixation(main_window, screen_dimensions, fixation_colour, tracking)
 % GAZE_CONTINGENT_FIXATION: 
 
 RGB = RGB_colours;
@@ -39,7 +39,9 @@ fixAOIrect = [screen_dimensions(2, 1) - fix_aoi_radius    screen_dimensions(2, 2
 
 [fixationTex, colouredFixationTex, fixationAOIsprite, colouredFixationAOIsprite, gazePointSprite, stimWindow, main_window] = setupStimuli(main_window, fix_size, gazePointRadius, fixation_colour);
 
-trialEGarray = zeros(timeoutDuration(exptPhase + 1) * 2 * 300, 27);    % Preallocate memory for eyetracking data. Tracker samples at 300Hz, so multiplying timeout duration by 2*300 means there will be plenty of slots
+if tracking == true
+    trialEGarray = zeros(timeoutDuration(exptPhase + 1) * 2 * 300, 27);    % Preallocate memory for eyetracking data. Tracker samples at 300Hz, so multiplying timeout duration by 2*300 means there will be plenty of slots
+end
 % ANDY - still need this
 
 Screen('Flip', main_window);     % Clear anything that's on the screen
@@ -60,70 +62,76 @@ WaitSecs(briefPause);
 Screen('DrawTexture', main_window, fixationAOIsprite, [], fixAOIrect);
 Screen('DrawTexture', main_window, fixationTex, [], fixRect);
 
-timeOnFixation = zeros(2);    % a slot for each stimulus location, and one for "everywhere else"
-stimSelected = 2;   % 1 = fixation cross, 2 = everywhere else
-fixated_on_fixation_cross = 0;
-fixationBadSamples = 0;
-fixationTimeout = 0;
+if tracking == true
+    % use tracker
+    timeOnFixation = zeros(2);    % a slot for each stimulus location, and one for "everywhere else"
+    stimSelected = 2;   % 1 = fixation cross, 2 = everywhere else
+    fixated_on_fixation_cross = 0;
+    fixationBadSamples = 0;
+    fixationTimeout = 0;
 
-currentGazePoint = zeros(1,2);
-gazeCycle = 0;
+    currentGazePoint = zeros(1,2);
+    gazeCycle = 0;
 
-startFixationTime = Screen('Flip', main_window, [], 1);     % Present fixation cross
-
-
-[~, ~, ts, ~] = tetio_readGazeData; % Empty eye tracker buffer
-startEyePeriod = double(ts(end));  % Take the timestamp of the last element in the buffer as the start of the trial. Need to convert to double so can divide by 10^6 later to change to seconds
-startFixationTimeoutPeriod = startEyePeriod;
+    startFixationTime = Screen('Flip', main_window, [], 1);     % Present fixation cross
 
 
-while fixated_on_fixation_cross == 0
-    
-    Screen('DrawTexture', main_window, fixationAOIsprite, [], fixAOIrect);   % Redraw fixation cross and AOI, and draw gaze point on top of that
-    Screen('DrawTexture', main_window, fixationTex, [], fixRect);
+    [~, ~, ts, ~] = tetio_readGazeData; % Empty eye tracker buffer
+    startEyePeriod = double(ts(end));  % Take the timestamp of the last element in the buffer as the start of the trial. Need to convert to double so can divide by 10^6 later to change to seconds
+    startFixationTimeoutPeriod = startEyePeriod;
 
-    WaitSecs(fixationPollingInterval);      % Pause between updates of eye position
-    [lefteye, righteye, ts, ~] = tetio_readGazeData;    % Get eye-tracker data since previous call
 
-    if isempty(ts) == 0
+    while fixated_on_fixation_cross == 0
 
-        [eyeX, eyeY, validPoints] = findMeanGazeLocation(lefteye, righteye, length(ts), screen_dimensions);    % Find mean gaze location during the previous polling interval
+        Screen('DrawTexture', main_window, fixationAOIsprite, [], fixAOIrect);   % Redraw fixation cross and AOI, and draw gaze point on top of that
+        Screen('DrawTexture', main_window, fixationTex, [], fixRect);
 
-        gazeCycle = gazeCycle + 1;
+        WaitSecs(fixationPollingInterval);      % Pause between updates of eye position
+        [lefteye, righteye, ts, ~] = tetio_readGazeData;    % Get eye-tracker data since previous call
 
-        if validPoints > 0
-            if gazeCycle <= junkGazeCycles
-                currentGazePoint = [eyeX, eyeY];        % If in junk period at start of trial, keep track of gaze location; this will determine starting point of gaze when the junk period ends
+        if isempty(ts) == 0
+
+            [eyeX, eyeY, validPoints] = findMeanGazeLocation(lefteye, righteye, length(ts), screen_dimensions);    % Find mean gaze location during the previous polling interval
+
+            gazeCycle = gazeCycle + 1;
+
+            if validPoints > 0
+                if gazeCycle <= junkGazeCycles
+                    currentGazePoint = [eyeX, eyeY];        % If in junk period at start of trial, keep track of gaze location; this will determine starting point of gaze when the junk period ends
+                else
+                    currentGazePoint = (1 - gamma) * currentGazePoint + gamma * [eyeX, eyeY];       % Calculate smoothed gaze location using weighted moving average of current and previous locations
+
+                    Screen('DrawTexture', main_window, gazePointSprite, [], [currentGazePoint(1) - gazePointRadius, currentGazePoint(2) - gazePointRadius, currentGazePoint(1) + gazePointRadius, currentGazePoint(2) + gazePointRadius]);
+                    Screen('DrawingFinished', main_window);
+
+                    stimSelected = checkEyesOnFixation(eyeX, eyeY, screen_dimensions, fix_aoi_radius);     % If some gaze has been detected, check whether this is on the fixation cross, or "everywhere else"
+
+                end
+
             else
-                currentGazePoint = (1 - gamma) * currentGazePoint + gamma * [eyeX, eyeY];       % Calculate smoothed gaze location using weighted moving average of current and previous locations
-
-                Screen('DrawTexture', main_window, gazePointSprite, [], [currentGazePoint(1) - gazePointRadius, currentGazePoint(2) - gazePointRadius, currentGazePoint(1) + gazePointRadius, currentGazePoint(2) + gazePointRadius]);
-                Screen('DrawingFinished', main_window);
-
-                stimSelected = checkEyesOnFixation(eyeX, eyeY, screen_dimensions, fix_aoi_radius);     % If some gaze has been detected, check whether this is on the fixation cross, or "everywhere else"
-
+                stimSelected = 2;   % If no gaze detected, record gaze as "everywhere else"
+                fixationBadSamples = fixationBadSamples + 1;
             end
 
-        else
-            stimSelected = 2;   % If no gaze detected, record gaze as "everywhere else"
-            fixationBadSamples = fixationBadSamples + 1;
+            endEyePeriod = double(ts(end));     % Last entry in timestamp data gives end time of polling period
+            timeOnFixation(stimSelected) = timeOnFixation(stimSelected) + (endEyePeriod - startEyePeriod) / 10^6;   % Divided by 10^6 because eyetracker gives time in microseconds
+            startEyePeriod = endEyePeriod;      % Start of next polling period is end of the last one
+
         end
 
-        endEyePeriod = double(ts(end));     % Last entry in timestamp data gives end time of polling period
-        timeOnFixation(stimSelected) = timeOnFixation(stimSelected) + (endEyePeriod - startEyePeriod) / 10^6;   % Divided by 10^6 because eyetracker gives time in microseconds
-        startEyePeriod = endEyePeriod;      % Start of next polling period is end of the last one
+        if timeOnFixation(1) >= fixationFixationTime         % If fixated on target
+            fixated_on_fixation_cross = 1;
+        elseif (endEyePeriod - startFixationTimeoutPeriod)/ 10^6 >= fixationTimeoutDuration        % If time since start of fixation period > fixation timeout limit
+            fixated_on_fixation_cross = 2;
+            fixationTimeout = 1;
+        end
+
+        Screen('Flip', main_window);     % Update display with gaze point
 
     end
-
-    if timeOnFixation(1) >= fixationFixationTime         % If fixated on target
-        fixated_on_fixation_cross = 1;
-    elseif (endEyePeriod - startFixationTimeoutPeriod)/ 10^6 >= fixationTimeoutDuration        % If time since start of fixation period > fixation timeout limit
-        fixated_on_fixation_cross = 2;
-        fixationTimeout = 1;
-    end
-
-    Screen('Flip', main_window);     % Update display with gaze point
-
+    
+elseif tracking == false
+    WaitSecs(2);
 end
 
 
@@ -133,8 +141,10 @@ Screen('Flip', main_window);     % Present coloured fixation cross
 
 WaitSecs(yellowFixationDuration);
 
-tetio_stopTracking; % reset tracker in case it ballsed up during the fixation period
-tetio_startTracking;
+if tracking == true
+    tetio_stopTracking; % reset tracker in case it ballsed up during the fixation period
+    tetio_startTracking;
+end
 
 Screen('Flip', main_window);     % Show fixation cross without circle
 

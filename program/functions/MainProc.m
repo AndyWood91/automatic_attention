@@ -1,12 +1,17 @@
-function [] = MainProc(main_window, screen_dimensions, instructions_slides, DATA, RGB)
+function [] = MainProc(main_window, screen_dimensions, instructions_slides, DATA, RGB, tracking)
+if tracking == true
+    runET = 1;
+else
+    runET = 0;
+end
 
 test_rectangle = [0 0 screen_dimensions(1, 1) screen_dimensions(1, 2)];
 
-runET = 1;
 
 commandwindow;
 
 if runET == 1
+    tetio_startTracking;
 %     runPTBcalibration; runET = 1;  % ANDY - moved this to PTB screens
 end
 
@@ -53,7 +58,6 @@ create_gabors;
 
 %%
 
-tetio_startTracking;
 
 restCount = 0;
 
@@ -127,7 +131,7 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
         RevInst = RGB('green');  % reverse trial
     end
     
-    gaze_contingent_fixation(main_window, screen_dimensions, RevInst);
+    gaze_contingent_fixation(main_window, screen_dimensions, RevInst, false);
     % TODO: this is redrawing and remaking the textures on every trial,
     % need to refactor it.
     
@@ -172,7 +176,9 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     
     % Q to quit program - you might take this out of final version
     if choice == KbName('q');
-        tetio_stopTracking;
+        if tracking == true
+            tetio_stopTracking;
+        end
         sca;
         error('user termination, exiting program');
     end
