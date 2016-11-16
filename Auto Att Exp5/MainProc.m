@@ -1,6 +1,6 @@
 function  MainProc
 
-runET = 1;
+runET = 1; % controls running of ET or not
 
 commandwindow;
 
