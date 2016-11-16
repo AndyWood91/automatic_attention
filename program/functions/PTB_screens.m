@@ -5,7 +5,6 @@ function [main_window, off_window, screen_dimensions] = PTB_screens(background, 
     end
     
     global TESTING
-    tracking = false;
     % screen dimensions
     screen_number = 0;  % primary monitor
     [screen_width, screen_height] = Screen('WindowSize', screen_number);
