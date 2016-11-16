@@ -5,7 +5,7 @@ else
     runET = 0;
 end
 
-test_rectangle = [0 0 screen_dimensions(1, 1) screen_dimensions(1, 2)];
+test_rectangle = [0 0 screen_dimensions(1, 1) screen_dimensions(1, 2)];  % I think this is obsolete now
 
 
 commandwindow;
@@ -149,33 +149,22 @@ for trial = 1:size(trialStructure,1) % gets number of trials from size of finalT
     % need to refactor it.
     
    
-    % Draw gabors on screen
-    % which one is the correct one?
-    % draws two gabors, so need to check first I think
+   
     
-    
-        % 1 will be on the left, 2 on the right
-    %
+    % Draw Gabor in test phase
     Screen('DrawTexture', main_window, myGrating, [], gabor_position(target_gabor,:), ...
         trialAngles(circleOrder(target_gabor)), [], [], ...
         gabor_colours(circleOrder(target_gabor), :), [], kPsychDontDoRotation, ...
         gabor_proportions);
-        
-        % 1
-        % Screen('DrawTexture', main_window, myGrating, [],
-        % gabor_position(1, :), trialAngles(circleOrder(1)), [], [], 
-        % gabor_colours(circleOrder(1), :), [], kPsychDontDoRotation,
-        % gabor_proportions);
-        
-        % 2
-        % Screen('DrawTexture', main_window, myGrating, [],
-        % gabor_position(2, :), trialAngles(circleOrder(2)), [], [],
-        % gabor_colours(circleOrder(2), :), [], kPsychDontDoRotation,
-        % gabor_proportions);
     
-    % draw gabor in middle of screen (for training phase!)
-    % work out which one is the angled one
-%     Screen('DrawTexture', main_window, myGrating, [], gabor_position(1,:), trialAngles(circleOrder(1)), [], [], gabor_colours(circleOrder(1),:), [], kPsychDontDoRotation, gabor_proportions);
+    % draw gabors
+%     for c = 1:2
+%         Screen('DrawTexture', main_window, myGrating, [], ...,
+%             gabor_position(c,:), trialAngles(circleOrder(c)), [], [], ...
+%             gabor_colours(circleOrder(c), :), [], kPsychDontDoRotation, ...
+%             gabor_proportions);
+%     end
+        
 
     tempTS(3) = Screen('Flip', main_window);
     
